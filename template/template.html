@@ -58,10 +58,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:18px 4
 .feature-item{font-size:12px;color:var(--text-body);padding-left:16px;position:relative;line-height:1.6}
 .feature-item::before{content:'';position:absolute;left:0;top:8px;width:6px;height:0.5px;background:var(--gold)}
 .nbhd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.nbhd-card{background:var(--sand);padding:24px 22px;border:0.5px solid var(--sand-deep)}
+.nbhd-card{background:var(--white);padding:28px 26px;border:0.5px solid var(--sand-deep);border-radius:16px;box-shadow:0 2px 12px rgba(42,31,20,0.06);transition:transform 0.2s,box-shadow 0.2s}.nbhd-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(42,31,20,0.12)}
 .nbhd-card h4{font-family:var(--serif);font-size:15px;color:var(--espresso);margin-bottom:8px;font-weight:400}
 .nbhd-card p{font-size:12px;color:var(--text-muted);line-height:1.8}
-.nbhd-icon{width:34px;height:34px;background:var(--white);border:0.5px solid var(--sand-deep);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.nbhd-icon{width:44px;height:44px;background:var(--sand);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
 .nbhd-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5}
 .oh-row{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:var(--white);border:0.5px solid var(--sand-deep);margin-bottom:8px}
 .oh-date{font-family:var(--serif);font-size:17px;color:var(--espresso)}
@@ -71,23 +71,23 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:18px 4
 .tour-box p{color:var(--text-muted);font-size:13px;margin-bottom:24px;line-height:1.9;max-width:440px;margin-left:auto;margin-right:auto}
 .btn-espresso{background:var(--espresso);color:var(--white);font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;padding:14px 36px;border:none;cursor:pointer;font-family:var(--sans);transition:background 0.2s,transform 0.15s,box-shadow 0.2s}.btn-espresso:hover{background:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,169,110,0.35)}
 .docs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.doc-item{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--white);border:0.5px solid var(--sand-deep);cursor:pointer;text-decoration:none;transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s}.doc-item:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,169,110,0.2)}
-.doc-icon{width:34px;height:34px;background:var(--sand);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:0.5px solid var(--sand-deep)}
+.doc-item{display:flex;align-items:center;gap:14px;padding:18px 20px;background:var(--white);border:0.5px solid var(--sand-deep);border-radius:14px;cursor:pointer;text-decoration:none;transition:border-color 0.2s,transform 0.15s,box-shadow 0.2s}.doc-item:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 6px 20px rgba(201,169,110,0.2)}
+.doc-icon{width:38px;height:38px;background:var(--sand);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .doc-icon svg{width:15px;height:15px;stroke:var(--text-muted);fill:none;stroke-width:1.5}
 .doc-name{font-size:12px;color:var(--espresso);font-weight:500;line-height:1.4}
 .doc-size{font-size:11px;color:var(--text-muted);margin-top:2px}
-.calc-wrap{background:var(--white);padding:36px;max-width:500px;border:0.5px solid var(--sand-deep)}
-.calc-price-row{display:flex;justify-content:space-between;align-items:center;padding-bottom:20px;margin-bottom:20px;border-bottom:0.5px solid var(--sand-deep)}
+.calc-wrap{background:var(--white);padding:36px;max-width:780px;margin:0 auto;border:0.5px solid var(--sand-deep);border-radius:16px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.calc-price-row{display:flex;justify-content:space-between;align-items:center;padding-bottom:20px;margin-bottom:20px;border-bottom:0.5px solid var(--sand-deep);grid-column:span 2}
 .calc-price-label{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
 .calc-price-val{font-family:var(--serif);font-size:22px;color:var(--espresso)}
 .calc-field{margin-bottom:18px}
 .calc-field label{display:block;font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
 .calc-field input,.calc-field select{width:100%;border:none;border-bottom:0.5px solid var(--sand-deep);padding:8px 0;font-size:16px;font-family:var(--serif);color:var(--espresso);outline:none;background:transparent}
-.calc-result{background:var(--espresso);padding:22px 26px;display:flex;justify-content:space-between;align-items:center}
+.calc-result{background:var(--espresso);padding:22px 26px;display:flex;justify-content:space-between;align-items:center;border-radius:12px;grid-column:span 2}
 .calc-result .rl{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:2px;text-transform:uppercase}
 .calc-result .ra{font-family:var(--serif);font-size:28px;color:var(--gold)}
 .agent-wrap{display:flex;gap:36px;align-items:flex-start}
-.agent-photo{width:110px;height:130px;object-fit:cover;flex-shrink:0}
+.agent-photo{width:120px;height:140px;object-fit:cover;flex-shrink:0;border-radius:12px;background:var(--sand-deep);display:block}.agent-photo-placeholder{width:120px;height:140px;flex-shrink:0;border-radius:12px;background:var(--sand-mid);border:1.5px dashed var(--sand-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text-muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--sans)}
 .agent-info h3{font-family:var(--serif);font-size:24px;color:var(--espresso);font-weight:400;margin-bottom:4px}
 .agent-title-line{font-size:10px;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px}
 .agent-bio{font-size:13px;color:var(--text-body);line-height:1.95;max-width:500px;margin-bottom:20px}
@@ -241,7 +241,7 @@ footer{background:var(--espresso);padding:32px 44px;display:flex;justify-content
 <section class="section section-white" id="agent">
   <div class="section-title">Your agent</div>
   <div class="agent-wrap">
-    <img class="agent-photo" src="photos/agent.jpg" alt="{{AGENT_NAME}}">
+    <div class="agent-photo-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Add photo</div>
     <div class="agent-info">
       <h3>{{AGENT_NAME}}</h3>
       <div class="agent-title-line">{{AGENT_TITLE}} · {{AGENT_BROKERAGE}}</div>
