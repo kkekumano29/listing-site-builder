@@ -237,26 +237,159 @@ footer{background:var(--espresso);padding:32px 44px;display:flex;justify-content
 </section>
 
 <section class="section section-sand" id="calculator">
-  <div class="section-title">Mortgage calculator</div>
-  <div class="calc-wrap">
-    <div class="calc-price-row">
-      <span class="calc-price-label">Purchase price</span>
-      <span class="calc-price-val">$400,000</span>
+<div class="section-title">Mortgage calculator</div>
+<style>
+.adv-calc{background:var(--white);border-radius:20px;padding:32px;max-width:860px;margin:0 auto;border:0.5px solid var(--sand-deep)}
+.lt-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.lt-btn{background:var(--sand);border:0.5px solid var(--sand-deep);color:var(--text-muted);padding:10px 6px;font-size:10px;font-weight:600;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all 0.15s;text-align:center;font-family:var(--sans)}
+.lt-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lt-btn.ac{background:var(--espresso);border-color:var(--espresso);color:var(--white)}
+.ln-note{font-size:11px;color:var(--text-muted);margin:6px 0 18px;padding:8px 12px;background:var(--sand);border-radius:8px;border:0.5px solid var(--sand-deep);font-family:var(--sans)}
+.calc-top{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px}
+.inp-col{display:flex;flex-direction:column;gap:14px}
+.cf{display:flex;flex-direction:column;gap:5px}
+.cf label{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;font-weight:500;font-family:var(--sans)}
+.cf input,.cf select{background:var(--white);border:0.5px solid var(--sand-deep);color:var(--espresso);padding:10px 14px;font-size:15px;font-family:var(--serif);outline:none;border-radius:10px;transition:border-color 0.2s;width:100%}
+.cf input:focus,.cf select:focus{border-color:var(--gold)}
+.dp-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
+.dp-btn{background:var(--white);border:0.5px solid var(--sand-deep);color:var(--text-muted);padding:7px 4px;font-size:10px;font-weight:600;letter-spacing:0.5px;border-radius:8px;cursor:pointer;transition:all 0.15s;text-align:center;font-family:var(--sans)}
+.dp-btn:hover{border-color:var(--gold);color:var(--gold)}
+.dp-btn.ac{background:var(--gold);border-color:var(--gold);color:var(--white)}
+.res-col{display:flex;flex-direction:column;gap:10px}
+.mo-big{background:var(--espresso);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:4px}
+.mo-lbl{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:2px;text-transform:uppercase;font-family:var(--sans)}
+.mo-amt{font-family:var(--serif);font-size:40px;color:var(--gold);font-weight:400;line-height:1.1}
+.mo-sub{font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;font-family:var(--sans)}
+.bd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bc{background:var(--sand);border-radius:10px;padding:12px}
+.bc-lbl{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;font-family:var(--sans)}
+.bc-val{font-family:var(--serif);font-size:17px;color:var(--espresso)}
+.bc-sub{font-size:10px;color:var(--text-muted);margin-top:2px;font-family:var(--sans)}
+.extras-box{background:var(--sand);border-radius:14px;padding:18px;margin-bottom:16px}
+.ex-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ex-header-lbl{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;font-family:var(--sans)}
+.ex-header-hint{font-size:10px;color:var(--text-muted);font-family:var(--sans)}
+.ex-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--sand-deep)}
+.ex-row:last-child{border-bottom:none;padding-bottom:0}
+.ex-row:first-of-type{padding-top:8px}
+.tog{width:36px;height:20px;background:var(--sand-deep);border-radius:10px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0}
+.tog.on{background:var(--gold)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--white);border-radius:50%;transition:transform 0.2s}
+.tog.on::after{transform:translateX(16px)}
+.ex-info{flex:1;min-width:0}
+.ex-name{font-size:12px;color:var(--espresso);font-weight:500;font-family:var(--sans)}
+.ex-desc{font-size:10px;color:var(--text-muted);margin-top:1px;font-family:var(--sans)}
+.ex-amt{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.qv{background:var(--white);border:0.5px solid var(--sand-deep);color:var(--espresso);padding:5px 10px;font-size:12px;font-family:var(--serif);border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.15s;white-space:nowrap}
+.qv:hover{border-color:var(--gold);color:var(--gold)}
+.qv.used{background:var(--gold);border-color:var(--gold);color:var(--white)}
+.ci{width:76px;background:var(--white);border:0.5px solid var(--sand-deep);color:var(--espresso);padding:5px 8px;font-size:12px;font-family:var(--serif);border-radius:6px;outline:none;transition:border-color 0.2s}
+.ci:focus{border-color:var(--gold)}
+.per-mo{font-size:10px;color:var(--text-muted);font-family:var(--sans)}
+.bar-box{background:var(--sand);border-radius:14px;padding:18px;margin-bottom:12px}
+.bar-ttl{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;font-family:var(--sans)}
+.br{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.br:last-child{margin-bottom:0}
+.br-lbl{font-size:11px;color:var(--text-body);width:88px;flex-shrink:0;font-family:var(--sans)}
+.br-track{flex:1;height:7px;background:var(--sand-deep);border-radius:4px;overflow:hidden}
+.br-fill{height:100%;border-radius:4px;transition:width 0.4s}
+.br-amt{font-size:11px;color:var(--espresso);font-weight:500;min-width:68px;text-align:right;font-family:var(--sans)}
+.af-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.afc{background:var(--white);border:0.5px solid var(--sand-deep);border-radius:10px;padding:12px;text-align:center}
+.afc-lbl{font-size:9px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;font-family:var(--sans)}
+.afc-val{font-family:var(--serif);font-size:15px;color:var(--espresso)}
+@media(max-width:768px){.calc-top{grid-template-columns:1fr}.af-row{grid-template-columns:1fr 1fr}}
+</style>
+<div class="adv-calc">
+  <div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;font-family:var(--sans);margin-bottom:8px">Loan type</div>
+  <div class="lt-row">
+    <div class="lt-btn ac" id="lt-conv" onclick="setLoan('conv')">Conventional</div>
+    <div class="lt-btn" id="lt-va" onclick="setLoan('va')">VA Loan</div>
+    <div class="lt-btn" id="lt-fha" onclick="setLoan('fha')">FHA</div>
+  </div>
+  <div class="ln-note" id="ln-note">Conventional: standard financing, requires 3–20% down. Best for buyers with strong credit.</div>
+  <div class="calc-top">
+    <div class="inp-col">
+      <div class="cf"><label>Purchase price</label><input type="number" id="ac-price" value="400000" oninput="acCalc()"></div>
+      <div class="cf">
+        <label>Down payment ($)</label>
+        <input type="number" id="ac-dp" value="80000" oninput="acCalc()">
+        <div class="dp-row">
+          <div class="dp-btn" onclick="acSetDP(3.5,this)">3.5%</div>
+          <div class="dp-btn" onclick="acSetDP(5,this)">5%</div>
+          <div class="dp-btn ac" onclick="acSetDP(10,this)">10%</div>
+          <div class="dp-btn" onclick="acSetDP(20,this)">20%</div>
+        </div>
+      </div>
+      <div class="cf"><label>Interest rate (%)</label><input type="number" id="ac-rate" value="6.875" step="0.125" oninput="acCalc()"></div>
+      <div class="cf"><label>Loan term</label>
+        <select id="ac-term" onchange="acCalc()">
+          <option value="360">30 years</option>
+          <option value="240">20 years</option>
+          <option value="180">15 years</option>
+        </select>
+      </div>
     </div>
-    <div class="calc-field"><label>Down payment ($)</label><input id="dp" type="number" value="80000"></div>
-    <div class="calc-field"><label>Interest rate (%)</label><input id="rate" type="number" value="6.875" step="0.125"></div>
-    <div class="calc-field"><label>Loan term</label>
-      <select id="term">
-        <option value="360">30 years</option>
-        <option value="240">20 years</option>
-        <option value="180">15 years</option>
-      </select>
-    </div>
-    <div class="calc-result">
-      <span class="rl">Est. monthly payment</span>
-      <span class="ra" id="monthly">—</span>
+    <div class="res-col">
+      <div class="mo-big">
+        <div class="mo-lbl">Est. monthly payment</div>
+        <div class="mo-amt" id="ac-monthly">$2,102</div>
+        <div class="mo-sub" id="ac-sub">Principal &amp; interest only</div>
+      </div>
+      <div class="bd-grid">
+        <div class="bc"><div class="bc-lbl">Loan amount</div><div class="bc-val" id="ac-loan">$320,000</div><div class="bc-sub" id="ac-dpct">80% financed</div></div>
+        <div class="bc"><div class="bc-lbl">Total interest</div><div class="bc-val" id="ac-tint">$436,800</div><div class="bc-sub">over loan term</div></div>
+        <div class="bc"><div class="bc-lbl">Total cost</div><div class="bc-val" id="ac-tcost">$756,800</div><div class="bc-sub">price + interest</div></div>
+        <div class="bc"><div class="bc-lbl">Payoff year</div><div class="bc-val" id="ac-payoff">2055</div><div class="bc-sub" id="ac-psub">30-yr term</div></div>
+      </div>
     </div>
   </div>
+  <div class="extras-box">
+    <div class="ex-header">
+      <span class="ex-header-lbl">Additional monthly costs</span>
+      <span class="ex-header-hint">Toggle on · click listing amount or enter custom</span>
+    </div>
+    <div class="ex-row">
+      <div class="tog" id="tog-hoa" onclick="acToggle('hoa')"></div>
+      <div class="ex-info"><div class="ex-name">HOA fees</div><div class="ex-desc">Hale O Pumehana — includes cable, internet, water &amp; sewer</div></div>
+      <div class="ex-amt">
+        <div class="qv used" id="qv-hoa" onclick="acQuick('hoa',934)">$934</div>
+        <input class="ci" id="ci-hoa" type="number" value="934" oninput="acCustom('hoa')">
+        <span class="per-mo">/mo</span>
+      </div>
+    </div>
+    <div class="ex-row">
+      <div class="tog" id="tog-tax" onclick="acToggle('tax')"></div>
+      <div class="ex-info"><div class="ex-name">Property tax</div><div class="ex-desc">2025 assessed — TMK 1-2-1-040-014-0037</div></div>
+      <div class="ex-amt">
+        <div class="qv used" id="qv-tax" onclick="acQuick('tax',92)">$92</div>
+        <input class="ci" id="ci-tax" type="number" value="92" oninput="acCustom('tax')">
+        <span class="per-mo">/mo</span>
+      </div>
+    </div>
+    <div class="ex-row">
+      <div class="tog" id="tog-ins" onclick="acToggle('ins')"></div>
+      <div class="ex-info"><div class="ex-name">Home insurance</div><div class="ex-desc">Estimated — verify with your insurance provider</div></div>
+      <div class="ex-amt">
+        <div class="qv used" id="qv-ins" onclick="acQuick('ins',80)">$80</div>
+        <input class="ci" id="ci-ins" type="number" value="80" oninput="acCustom('ins')">
+        <span class="per-mo">/mo</span>
+      </div>
+    </div>
+  </div>
+  <div class="bar-box">
+    <div class="bar-ttl">Monthly payment breakdown</div>
+    <div class="br"><div class="br-lbl">Principal &amp; int.</div><div class="br-track"><div class="br-fill" id="bf-pi" style="background:#2A1F14;width:60%"></div></div><div class="br-amt" id="bl-pi">$2,102</div></div>
+    <div class="br" id="brow-hoa" style="opacity:0.3"><div class="br-lbl">HOA fees</div><div class="br-track"><div class="br-fill" id="bf-hoa" style="background:#C9A96E;width:25%"></div></div><div class="br-amt" id="bl-hoa">$934</div></div>
+    <div class="br" id="brow-tax" style="opacity:0.3"><div class="br-lbl">Property tax</div><div class="br-track"><div class="br-fill" id="bf-tax" style="background:#8A7A6A;width:5%"></div></div><div class="br-amt" id="bl-tax">$92</div></div>
+    <div class="br" id="brow-ins" style="opacity:0.3"><div class="br-lbl">Insurance</div><div class="br-track"><div class="br-fill" id="bf-ins" style="background:#B4A898;width:4%"></div></div><div class="br-amt" id="bl-ins">$80</div></div>
+  </div>
+  <div class="af-row">
+    <div class="afc"><div class="afc-lbl">Income needed</div><div class="afc-val" id="ac-inc">$84K/yr</div></div>
+    <div class="afc"><div class="afc-lbl">DTI ratio</div><div class="afc-val" id="ac-dti">28%</div></div>
+    <div class="afc"><div class="afc-lbl">Break-even rent</div><div class="afc-val" id="ac-be">$2,623/mo</div></div>
+  </div>
+</div>
 </section>
 
 <section class="section section-white" id="agent">
@@ -296,20 +429,84 @@ footer{background:var(--espresso);padding:32px 44px;display:flex;justify-content
 </footer>
 
 <script>
-var PRICE_RAW = 400000;
-function calc(){
-  var dp=parseFloat(document.getElementById('dp').value)||0;
-  var r=parseFloat(document.getElementById('rate').value)/100/12;
-  var n=parseInt(document.getElementById('term').value);
-  var loan=PRICE_RAW-dp;
-  if(loan<=0||r<=0){document.getElementById('monthly').textContent='$0';return;}
-  var p=loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
-  document.getElementById('monthly').textContent='$'+Math.round(p).toLocaleString();
+var acState={hoa:{on:false,val:934},tax:{on:false,val:92},ins:{on:false,val:80}};
+var acLoanType='conv';
+var acNotes={conv:'Conventional: standard financing, requires 3–20% down. Best for buyers with strong credit.',va:'VA Loan: 0% down for eligible veterans & active military. No PMI required.',fha:'FHA: 3.5% minimum down, more flexible credit requirements. Includes mortgage insurance.'};
+function setLoan(t){
+  acLoanType=t;
+  ['conv','va','fha'].forEach(function(k){document.getElementById('lt-'+k).classList.remove('ac');});
+  document.getElementById('lt-'+t).classList.add('ac');
+  document.getElementById('ln-note').textContent=acNotes[t];
+  if(t==='va'){acSetDP(0,null);}else if(t==='fha'){acSetDP(3.5,null);}
+  acCalc();
 }
-document.getElementById('dp').addEventListener('input',calc);
-document.getElementById('rate').addEventListener('input',calc);
-document.getElementById('term').addEventListener('change',calc);
-calc();
+function acSetDP(pct,btn){
+  var p=parseFloat(document.getElementById('ac-price').value)||400000;
+  document.getElementById('ac-dp').value=Math.round(p*pct/100);
+  document.querySelectorAll('.dp-btn').forEach(function(b){b.classList.remove('ac');});
+  if(btn)btn.classList.add('ac');
+  acCalc();
+}
+function acToggle(k){
+  acState[k].on=!acState[k].on;
+  document.getElementById('tog-'+k).classList.toggle('on',acState[k].on);
+  document.getElementById('brow-'+k).style.opacity=acState[k].on?'1':'0.3';
+  acCalc();
+}
+function acQuick(k,v){
+  acState[k].val=v;
+  document.getElementById('ci-'+k).value=v;
+  document.getElementById('qv-'+k).classList.add('used');
+  if(!acState[k].on)acToggle(k);
+  acCalc();
+}
+function acCustom(k){
+  var v=parseFloat(document.getElementById('ci-'+k).value)||0;
+  acState[k].val=v;
+  document.getElementById('qv-'+k).classList.remove('used');
+  if(!acState[k].on)acToggle(k);
+  acCalc();
+}
+function acCalc(){
+  var price=parseFloat(document.getElementById('ac-price').value)||400000;
+  var dp=parseFloat(document.getElementById('ac-dp').value)||0;
+  var r=parseFloat(document.getElementById('ac-rate').value)/100/12;
+  var n=parseInt(document.getElementById('ac-term').value);
+  var loan=Math.max(0,price-dp);
+  var pi=loan>0&&r>0?loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1):0;
+  var hv=acState.hoa.on?acState.hoa.val:0;
+  var tv=acState.tax.on?acState.tax.val:0;
+  var iv=acState.ins.on?acState.ins.val:0;
+  var total=pi+hv+tv+iv;
+  var tint=Math.max(0,(pi*n)-loan);
+  var dpPct=price>0?Math.round((dp/price)*100):0;
+  var extras=[];
+  if(acState.hoa.on)extras.push('HOA');
+  if(acState.tax.on)extras.push('tax');
+  if(acState.ins.on)extras.push('insurance');
+  document.getElementById('ac-monthly').textContent='$'+Math.round(total).toLocaleString();
+  document.getElementById('ac-sub').textContent=extras.length?'Incl. '+extras.join(', '):'Principal & interest only';
+  document.getElementById('ac-loan').textContent='$'+Math.round(loan).toLocaleString();
+  document.getElementById('ac-dpct').textContent=(100-dpPct)+'% financed';
+  document.getElementById('ac-tint').textContent='$'+Math.round(tint).toLocaleString();
+  document.getElementById('ac-tcost').textContent='$'+Math.round(price+tint).toLocaleString();
+  document.getElementById('ac-payoff').textContent=new Date().getFullYear()+Math.round(n/12);
+  document.getElementById('ac-psub').textContent=Math.round(n/12)+'-yr term';
+  document.getElementById('bl-pi').textContent='$'+Math.round(pi).toLocaleString();
+  document.getElementById('bl-hoa').textContent='$'+acState.hoa.val.toLocaleString();
+  document.getElementById('bl-tax').textContent='$'+acState.tax.val.toLocaleString();
+  document.getElementById('bl-ins').textContent='$'+acState.ins.val.toLocaleString();
+  var mx=Math.max(pi,acState.hoa.val,acState.tax.val,acState.ins.val,1);
+  document.getElementById('bf-pi').style.width=Math.round((pi/mx)*100)+'%';
+  document.getElementById('bf-hoa').style.width=Math.round((acState.hoa.val/mx)*100)+'%';
+  document.getElementById('bf-tax').style.width=Math.round((acState.tax.val/mx)*100)+'%';
+  document.getElementById('bf-ins').style.width=Math.round((acState.ins.val/mx)*100)+'%';
+  var inc=Math.round((pi/0.28)*12);
+  document.getElementById('ac-inc').textContent='$'+Math.round(inc/1000)+'K/yr';
+  document.getElementById('ac-dti').textContent=Math.round((pi/(inc/12))*100)+'%';
+  document.getElementById('ac-be').textContent='$'+Math.round(total*1.25).toLocaleString()+'/mo';
+}
+acCalc();
 </script>
 </body>
 </html>
