@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>757 Kinalau Pl #1002, Honolulu — The Agency Team Hawai'i</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --espresso:#2A1F14;
+  --espresso-mid:#4A3728;
+  --gold:#C9A96E;
+  --gold-light:#D9BB84;
+  --sand:#F7F3EE;
+  --sand-mid:#EFE9E0;
+  --sand-deep:#E5DDD0;
+  --white:#FFFFFF;
+  --text-muted:#8A7A6A;
+  --text-body:#5A4A3A;
+  --serif:'Playfair Display',serif;
+  --sans:'Montserrat',sans-serif;
+}
+body{background:var(--sand);color:var(--espresso);font-family:var(--sans);font-weight:300}
+nav{display:flex;justify-content:space-between;align-items:center;padding:18px 40px;background:var(--white);border-bottom:0.5px solid var(--sand-deep);position:sticky;top:0;z-index:100}
+.nav-logo{font-family:var(--serif);font-size:20px;color:var(--espresso);letter-spacing:2px}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:28px}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--gold)}
+.hero{position:relative;height:580px;overflow:hidden}
+.hero img{width:100%;height:100%;object-fit:cover}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(42,31,20,0.88) 0%,rgba(42,31,20,0.35) 55%,rgba(42,31,20,0.05) 100%)}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:44px}
+.hero-badge{display:inline-block;background:var(--gold);color:var(--white);font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;padding:5px 14px;margin-bottom:18px;font-family:var(--sans)}
+.hero-address{font-family:var(--serif);font-size:38px;font-weight:400;line-height:1.15;margin-bottom:8px;color:var(--white)}
+.hero-address em{color:var(--gold);font-style:italic}
+.hero-sub{font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:3px;text-transform:uppercase;margin-bottom:22px}
+.hero-price{font-family:var(--serif);font-size:30px;color:var(--gold);font-weight:600}
+.hero-stats{display:flex;gap:36px;margin-top:22px;padding-top:22px;border-top:0.5px solid rgba(201,169,110,0.3)}
+.hero-stat .val{font-size:17px;font-weight:500;color:var(--white)}
+.hero-stat .lbl{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2.5px;text-transform:uppercase;margin-top:3px}
+.section{padding:56px 44px}
+.section-white{background:var(--white)}
+.section-sand{background:var(--sand)}
+.section-title{font-family:var(--serif);font-size:27px;font-weight:400;color:var(--espresso);margin-bottom:10px}
+.section-title::after{content:'';display:block;width:32px;height:1px;background:var(--gold);margin-top:12px;margin-bottom:30px}
+.gallery-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:230px 160px;gap:5px}
+.gallery-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-grid .main{grid-row:span 2}
+.gallery-more{display:inline-block;margin-top:16px;font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;border-bottom:0.5px solid var(--gold);padding-bottom:2px;cursor:pointer}
+.details-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--sand-deep)}
+.detail-cell{background:var(--white);padding:26px 20px;text-align:center}
+.detail-val{font-family:var(--serif);font-size:30px;color:var(--espresso);margin-bottom:5px}
+.detail-label{font-size:9px;color:var(--text-muted);letter-spacing:2.5px;text-transform:uppercase}
+.about-text{font-size:13px;color:var(--text-body);line-height:2;max-width:660px;margin-bottom:24px}
+.tag{display:inline-block;border:0.5px solid var(--sand-deep);color:var(--text-muted);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;margin-right:6px;margin-bottom:6px}
+.features-list{display:grid;grid-template-columns:1fr 1fr;gap:10px 48px;margin-top:28px}
+.feature-item{font-size:12px;color:var(--text-body);padding-left:16px;position:relative;line-height:1.6}
+.feature-item::before{content:'';position:absolute;left:0;top:8px;width:6px;height:0.5px;background:var(--gold)}
+.nbhd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.nbhd-card{background:var(--sand);padding:24px 22px;border:0.5px solid var(--sand-deep)}
+.nbhd-card h4{font-family:var(--serif);font-size:15px;color:var(--espresso);margin-bottom:8px;font-weight:400}
+.nbhd-card p{font-size:12px;color:var(--text-muted);line-height:1.8}
+.nbhd-icon{width:34px;height:34px;background:var(--white);border:0.5px solid var(--sand-deep);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.nbhd-icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5}
+.oh-row{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:var(--white);border:0.5px solid var(--sand-deep);margin-bottom:8px}
+.oh-date{font-family:var(--serif);font-size:17px;color:var(--espresso)}
+.oh-time{font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-top:4px}
+.oh-btn{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--white);background:var(--espresso);padding:8px 18px;border:none;cursor:pointer;font-family:var(--sans);font-weight:500}
+.docs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.doc-item{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--white);border:0.5px solid var(--sand-deep);cursor:pointer;text-decoration:none;transition:border-color 0.2s}
+.doc-item:hover{border-color:var(--gold)}
+.doc-icon{width:34px;height:34px;background:var(--sand);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:0.5px solid var(--sand-deep)}
+.doc-icon svg{width:15px;height:15px;stroke:var(--text-muted);fill:none;stroke-width:1.5}
+.doc-name{font-size:12px;color:var(--espresso);font-weight:500;line-height:1.4}
+.doc-size{font-size:11px;color:var(--text-muted);margin-top:2px}
+.calc-wrap{background:var(--white);padding:36px;max-width:500px;border:0.5px solid var(--sand-deep)}
+.calc-price-row{display:flex;justify-content:space-between;align-items:center;padding-bottom:20px;margin-bottom:20px;border-bottom:0.5px solid var(--sand-deep)}
+.calc-price-label{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
+.calc-price-val{font-family:var(--serif);font-size:22px;color:var(--espresso)}
+.calc-field{margin-bottom:18px}
+.calc-field label{display:block;font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.calc-field input,.calc-field select{width:100%;border:none;border-bottom:0.5px solid var(--sand-deep);padding:8px 0;font-size:16px;font-family:var(--serif);color:var(--espresso);outline:none;background:transparent}
+.calc-result{background:var(--espresso);padding:22px 26px;display:flex;justify-content:space-between;align-items:center}
+.calc-result .rl{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:2px;text-transform:uppercase}
+.calc-result .ra{font-family:var(--serif);font-size:28px;color:var(--gold)}
+.agent-wrap{display:flex;gap:36px;align-items:flex-start}
+.agent-photo{width:110px;height:130px;object-fit:cover;flex-shrink:0}
+.agent-info h3{font-family:var(--serif);font-size:24px;color:var(--espresso);font-weight:400;margin-bottom:4px}
+.agent-title-line{font-size:10px;color:var(--gold);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px}
+.agent-bio{font-size:13px;color:var(--text-body);line-height:1.95;max-width:500px;margin-bottom:20px}
+.agent-contacts{display:flex;gap:32px}
+.agent-contact-item .lbl{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.agent-contact-item .val{font-size:13px;color:var(--espresso);font-weight:500}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-field{display:flex;flex-direction:column;gap:7px}
+.form-field label{font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
+.form-field input,.form-field textarea{background:var(--white);border:0.5px solid var(--sand-deep);color:var(--espresso);padding:12px 14px;font-size:13px;font-family:var(--sans);outline:none;transition:border-color 0.2s;resize:none}
+.form-field input:focus,.form-field textarea:focus{border-color:var(--gold)}
+.form-full{grid-column:span 2}
+.form-submit{width:100%;padding:16px;background:var(--espresso);color:var(--white);border:none;font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-family:var(--sans)}
+footer{background:var(--espresso);padding:32px 44px;display:flex;justify-content:space-between;align-items:center}
+.footer-logo{font-family:var(--serif);font-size:17px;color:rgba(255,255,255,0.7);letter-spacing:2px}
+.footer-logo span{color:var(--gold)}
+.footer-legal{font-size:11px;color:rgba(255,255,255,0.3);line-height:1.8;text-align:right}
+@media(max-width:768px){
+  nav{padding:14px 20px}.nav-links{display:none}
+  .hero{height:480px}.hero-content{padding:24px}
+  .hero-address{font-size:26px}.hero-stats{gap:20px;flex-wrap:wrap}
+  .section{padding:40px 20px}
+  .gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:160px 160px 160px}.gallery-grid .main{grid-row:span 1}
+  .details-grid{grid-template-columns:repeat(2,1fr)}
+  .nbhd-grid{grid-template-columns:1fr}
+  .docs-grid{grid-template-columns:1fr 1fr}
+  .agent-wrap{flex-direction:column}
+  .form-grid{grid-template-columns:1fr}.form-full{grid-column:span 1}
+  footer{flex-direction:column;gap:16px;text-align:center}.footer-legal{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">The <span>Agency</span></div>
+  <div class="nav-links">
+    <a href="#gallery">Gallery</a>
+    <a href="#details">Details</a>
+    <a href="#documents">Documents</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<section class="hero" id="hero">
+  <img src="photos/hero.jpg" alt="757 Kinalau Pl #1002, Honolulu">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Under Contract</div>
+    <div class="hero-address">757 Kinalau Pl #1002,<br><em>Honolulu, Hawai'i</em></div>
+    <div class="hero-sub">O'ahu · Hawaii · 96813</div>
+    <div class="hero-price">$400,000</div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="val">2</div><div class="lbl">Bedrooms</div></div>
+      <div class="hero-stat"><div class="val">2</div><div class="lbl">Bathrooms</div></div>
+      <div class="hero-stat"><div class="val">786</div><div class="lbl">Sq ft</div></div>
+      <div class="hero-stat"><div class="val">27,748</div><div class="lbl">Lot sq ft</div></div>
+      <div class="hero-stat"><div class="val">Covered · 1 Stall</div><div class="lbl">Parking</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-white" id="gallery">
+  <div class="section-title">Photo gallery</div>
+  <div class="gallery-grid">
+    <img class="main" src="photos/photo-01.jpg" alt="757 Kinalau Pl #1002, Honolulu - photo 1" loading="lazy">
+    <img src="photos/photo-02.jpg" alt="757 Kinalau Pl #1002, Honolulu - photo 2" loading="lazy">
+    <img src="photos/photo-03.jpg" alt="757 Kinalau Pl #1002, Honolulu - photo 3" loading="lazy">
+    <img src="photos/photo-04.jpg" alt="757 Kinalau Pl #1002, Honolulu - photo 4" loading="lazy">
+    <img src="photos/photo-05.jpg" alt="757 Kinalau Pl #1002, Honolulu - photo 5" loading="lazy">
+  </div>
+  <span class="gallery-more">+ View all photos</span>
+</section>
+
+<section class="section section-white" id="details" style="padding-top:0">
+  <div class="details-grid">
+    <div class="detail-cell"><div class="detail-val">2</div><div class="detail-label">Bedrooms</div></div>
+    <div class="detail-cell"><div class="detail-val">2</div><div class="detail-label">Bathrooms</div></div>
+    <div class="detail-cell"><div class="detail-val">786</div><div class="detail-label">Sq ft</div></div>
+    <div class="detail-cell"><div class="detail-val">$509</div><div class="detail-label">Per sq ft</div></div>
+  </div>
+  <div style="margin-top:40px">
+    <div class="section-title" style="font-size:22px">About this home</div>
+    <p class="about-text">Live above it all in this well-situated 2-bedroom, 2-bath condo in the heart of Honolulu. Perched on the 10th floor of Hale O Pumehana, the home captures sweeping city, ocean, and sunset views from an efficient 786-square-foot layout. Minutes from Downtown, Ward Village, and Kaka'ako, you're at the center of everything the island has to offer — dining, shopping, the waterfront, and quick freeway access. With VA, conventional, and cash financing all accepted, this is a rare opportunity for buyers, veterans, and investors to own in one of O'ahu's most sought-after central corridors. Central AC, in-unit laundry, and a covered parking stall complete the package.</p>
+    <div>
+      <span class="tag">10th Floor Views</span>
+      <span class="tag">Central AC</span>
+      <span class="tag">In-Unit Laundry</span>
+      <span class="tag">Covered Parking</span>
+      <span class="tag">VA Approved</span>
+      <span class="tag">Pets Allowed</span>
+    </div>
+    <div class="features-list">
+      <div class="feature-item">City, ocean, and sunset views from the 10th floor</div>
+      <div class="feature-item">Central AC throughout</div>
+      <div class="feature-item">In-unit washer and dryer</div>
+      <div class="feature-item">Covered parking stall included</div>
+      <div class="feature-item">Pool, storage, and trash chute on property</div>
+      <div class="feature-item">Cable TV and internet included in HOA</div>
+      <div class="feature-item">Key and video security</div>
+      <div class="feature-item">VA, conventional, and cash financing accepted</div>
+      <div class="feature-item">Pets allowed (verify)</div>
+      <div class="feature-item">Minutes to Downtown, Ward, and Kaka'ako</div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-sand" id="neighborhood">
+  <div class="section-title">The neighborhood</div>
+  <div class="nbhd-grid">
+    <div class="nbhd-card">
+      <div class="nbhd-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div>
+      <h4>Downtown &amp; Kaka'ako</h4>
+      <p>Steps from the energy of urban Honolulu — walkable to restaurants, coffee shops, boutiques, and the waterfront. Ward Village and Kaka'ako's art and dining scene are minutes away.</p>
+    </div>
+    <div class="nbhd-card">
+      <div class="nbhd-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <h4>Freeway &amp; Commute Access</h4>
+      <p>One of the most central locations on O'ahu. Quick on-ramp access to H-1 makes commuting to any part of the island fast and straightforward.</p>
+    </div>
+    <div class="nbhd-card">
+      <div class="nbhd-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <h4>Hospitals &amp; Medical</h4>
+      <p>Straub Benioff Medical Center and the Queen's Medical Center are both within a half mile — ideal for healthcare workers and those who value proximity to world-class medical care.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section-white" id="openhouses">
+  <div class="section-title">Open houses</div>
+  <p style="color:var(--text-muted);font-size:13px">No open houses currently scheduled. Contact us to arrange a private showing.</p>
+</section>
+
+<section class="section section-white" id="documents">
+  <div class="section-title">Buyer documents</div>
+  <div class="docs-grid">
+    <a class="doc-item" href="docs/Pil_Lee_Listing_SRPDS_Revise__1_.pdf" download>
+      <div class="doc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div><div class="doc-name">Seller's Disclosure (SRPDS)</div><div class="doc-size">PDF</div></div>
+    </a>
+    <a class="doc-item" href="docs/Lead Based Disc.pdf" download>
+      <div class="doc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div><div class="doc-name">Lead-Based Paint Disclosure</div><div class="doc-size">PDF</div></div>
+    </a>
+    <a class="doc-item" href="docs/Exhibit A.pdf" download>
+      <div class="doc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div><div class="doc-name">Exhibit A</div><div class="doc-size">PDF</div></div>
+    </a>
+  </div>
+</section>
+
+<section class="section section-sand" id="calculator">
+  <div class="section-title">Mortgage calculator</div>
+  <div class="calc-wrap">
+    <div class="calc-price-row">
+      <span class="calc-price-label">Purchase price</span>
+      <span class="calc-price-val">$400,000</span>
+    </div>
+    <div class="calc-field"><label>Down payment ($)</label><input id="dp" type="number" value="80000"></div>
+    <div class="calc-field"><label>Interest rate (%)</label><input id="rate" type="number" value="6.875" step="0.125"></div>
+    <div class="calc-field"><label>Loan term</label>
+      <select id="term">
+        <option value="360">30 years</option>
+        <option value="240">20 years</option>
+        <option value="180">15 years</option>
+      </select>
+    </div>
+    <div class="calc-result">
+      <span class="rl">Est. monthly payment</span>
+      <span class="ra" id="monthly">—</span>
+    </div>
+  </div>
+</section>
+
+<section class="section section-white" id="agent">
+  <div class="section-title">Your agent</div>
+  <div class="agent-wrap">
+    <img class="agent-photo" src="photos/agent.jpg" alt="Kalei Kekumano" onerror="this.style.display='none'">
+    <div class="agent-info">
+      <h3>Kalei Kekumano</h3>
+      <div class="agent-title-line">REALTOR® · The Agency Team Hawai'i · eXp Realty</div>
+      <p class="agent-bio">Born and raised on O'ahu, Kalei brings deep local expertise and a client-first approach to every transaction. Whether you're buying your first home, utilizing your VA benefit, or investing in Honolulu real estate, Kalei and the team at eXp Realty are with you every step of the way.</p>
+      <div class="agent-contacts">
+        <div class="agent-contact-item"><div class="lbl">Phone</div><div class="val">(808) 234-8025</div></div>
+        <div class="agent-contact-item"><div class="lbl">Email</div><div class="val">kalei.kekumano@exprealty.com</div></div>
+        <div class="agent-contact-item"><div class="lbl">License</div><div class="val">RS-87574</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-sand" id="contact">
+  <div class="section-title">Schedule a showing</div>
+  <form action="https://formspree.io/f/meepgydk" method="POST">
+    <div class="form-grid">
+      <div class="form-field"><label>First name</label><input type="text" name="first_name" required></div>
+      <div class="form-field"><label>Last name</label><input type="text" name="last_name" required></div>
+      <div class="form-field"><label>Email</label><input type="email" name="email" required></div>
+      <div class="form-field"><label>Phone</label><input type="tel" name="phone"></div>
+      <div class="form-field form-full"><label>Message</label><textarea name="message" rows="3" placeholder="I'd love to schedule a private showing..."></textarea></div>
+      <div class="form-full"><button type="submit" class="form-submit">Request a showing</button></div>
+    </div>
+  </form>
+</section>
+
+<footer>
+  <div class="footer-logo">The <span>Agency</span> Team Hawai'i</div>
+  <div class="footer-legal">© 2026 The Agency. All rights reserved.<br>Information deemed reliable but not guaranteed. Equal Housing Opportunity.<br>Kalei Kekumano · RS-87574</div>
+</footer>
+
+<script>
+var PRICE_RAW = 400000;
+function calc(){
+  var dp=parseFloat(document.getElementById('dp').value)||0;
+  var r=parseFloat(document.getElementById('rate').value)/100/12;
+  var n=parseInt(document.getElementById('term').value);
+  var loan=PRICE_RAW-dp;
+  if(loan<=0||r<=0){document.getElementById('monthly').textContent='$0';return;}
+  var p=loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  document.getElementById('monthly').textContent='$'+Math.round(p).toLocaleString();
+}
+document.getElementById('dp').addEventListener('input',calc);
+document.getElementById('rate').addEventListener('input',calc);
+document.getElementById('term').addEventListener('change',calc);
+calc();
+</script>
+</body>
+</html>
