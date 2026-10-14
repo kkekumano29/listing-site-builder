@@ -303,10 +303,10 @@ function textMsg(a) {
   if (l.status === "Pending") {
     const d = l.daysToContract;
     const fast = d == null || d > 21 ? "" : d === 0 ? " the same day it listed" : ` in ${d} day${d === 1 ? "" : "s"}`;
-    return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on ${l.street} going under contract${fast}! I'm reaching out to ask if you've received multiple offers on the property?`;
+    return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on ${l.street} going under contract${fast}! I'm reaching out to see if any other buyers got left out. Did you receive multiple offers on the property?`;
   }
   const over = l.soldPrice && l.listPrice && l.soldPrice > l.listPrice ? ` for ${overK(l.soldPrice - l.listPrice)} over asking` : "";
-  return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on closing ${l.street}${over}! I'm reaching out to ask if you had any other buyers who missed out on it?`;
+  return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on closing ${l.street}${over}! I'm reaching out to see if any other buyers got left out. Did you receive multiple offers on the property?`;
 }
 const smsHref = a => "sms:+1" + digits(a.phone).slice(-10) + "&body=" + encodeURIComponent(textMsg(a));
 function scriptHTML(a) {
