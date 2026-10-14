@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Call Sheet">
+<meta name="theme-color" content="#f7f2e8">
+<title>Paioa J204 Dialer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Lanikai: sand cream, turquoise actions, deep-lagoon banner. Light only. */
+:root{
+  --bg:#f7f2e8; --surface:#fffdf9; --sunk:#efe8da; --line:#e2d8c6;
+  --ink:#173a45; --muted:#687776; --accent:#087f80; --accent-ink:#ffffff; --accent-soft:#d5f0ec;
+  --hero-bg:#173a45; --hero-fg:#fbf6ec; --hero-tag:#f6c760; --hero-tag-ink:#173a45;
+  --hot:#d9480f; --hot-soft:#ffe4d3; --no:#4b6670; --no-soft:#e4ecee;
+  --vm:#a86f05; --vm-soft:#fbefc9; --na:#787d84; --na-soft:#eeede8;
+  --cb:#6a4fc4; --cb-soft:#ece6fb; --bad:#b42347; --bad-soft:#fbe1e7;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:10px; color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:14px 72px;display:flex;flex-direction:column;gap:12px}
+a{color:var(--accent)}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+h1,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+.listing{background:var(--hero-bg);color:var(--hero-fg);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px}
+.listing .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.listing h1{font-size:clamp(20px,5vw,28px);font-weight:800;font-stretch:78%;line-height:1.05}
+.listing .facts{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13.5px}
+.listing .tag{background:var(--hero-tag);color:var(--hero-tag-ink);font-weight:700;padding:2px 8px;border-radius:999px;font-size:12.5px;justify-self:start}
+.listing a{color:inherit}
+.progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;display:flex;flex-direction:column;min-width:0}
+.stat .n{font-family:var(--f-display);font-weight:800;font-stretch:80%;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.stat .l{font-size:11.5px;color:var(--muted)}
+.stat.hot .n{color:var(--hot)} .stat.cb .n{color:var(--cb)}
+.bar{height:5px;background:var(--sunk);border-radius:999px;overflow:hidden;grid-column:1/-1}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.toolbar{display:flex;flex-direction:column;gap:8px;position:sticky;top:0;z-index:5;background:var(--bg);margin-inline:-16px;padding:8px 16px;padding-top:calc(8px + env(safe-area-inset-top,0px));margin-top:calc(-1 * env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer;display:flex;gap:6px;align-items:center}
+.tab .c{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab[aria-selected="true"] .c{color:inherit;opacity:.75}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 11px;font-size:13.5px;font-weight:600;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.search{flex:1 1 160px;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;font-size:16px}
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;border-left:5px solid var(--line)}
+.card[data-tone="hot"]{border-left-color:var(--hot)} .card[data-tone="no"]{border-left-color:var(--no)}
+.card[data-tone="vm"]{border-left-color:var(--vm)} .card[data-tone="na"]{border-left-color:var(--na)}
+.card[data-tone="cb"]{border-left-color:var(--cb)} .card[data-tone="bad"]{border-left-color:var(--bad)}
+.head{display:flex;gap:10px;align-items:flex-start}
+.order{font-family:var(--f-mono);font-size:13px;color:var(--muted);padding-top:4px;min-width:2.2em}
+.who{flex:1;min-width:0}
+.name{font-size:21px;font-weight:750;font-stretch:85%;line-height:1.15}
+.office{font-size:13px;color:var(--muted)}
+.pill{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--sunk);color:var(--muted)}
+.pill[data-tone="hot"]{background:var(--hot-soft);color:var(--hot)} .pill[data-tone="no"]{background:var(--no-soft);color:var(--no)}
+.pill[data-tone="vm"]{background:var(--vm-soft);color:var(--vm)} .pill[data-tone="na"]{background:var(--na-soft);color:var(--na)}
+.pill[data-tone="cb"]{background:var(--cb-soft);color:var(--cb)} .pill[data-tone="bad"]{background:var(--bad-soft);color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12.5px;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chip.warn{background:var(--vm-soft);color:var(--vm)} .chip.team{background:var(--sunk);color:var(--ink)}
+.phone{font-family:var(--f-mono);font-size:22px;font-weight:600;color:var(--ink);text-decoration:none}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.big{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:10px;font-size:17px;font-weight:750;text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.big.call{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.big.text{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;font-size:14px;font-weight:650;cursor:pointer;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px;min-height:40px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.co{font-size:13px;color:var(--muted)}
+.co a{font-family:var(--f-mono);color:var(--ink)}
+.listings{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.listings li{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13.5px;background:var(--sunk);border-radius:8px;padding:8px 10px}
+.listings .mls{font-family:var(--f-mono);font-weight:600;font-size:13px}
+.listings .addr{font-weight:600;min-width:0}
+.listings .meta{grid-column:1/-1;color:var(--muted);font-size:12.5px}
+.st{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;margin-right:6px}
+.st.p{color:var(--accent)} .st.s{color:var(--muted)}
+details.script{border:1px solid var(--line);border-radius:8px}
+details.script summary{cursor:pointer;padding:9px 12px;font-weight:650;font-size:14px;list-style:none;display:flex;justify-content:space-between}
+details.script summary::-webkit-details-marker{display:none}
+details.script summary::after{content:"Show";font-size:12.5px;color:var(--accent)}
+details.script[open] summary::after{content:"Hide"}
+.sc{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px;font-size:14.5px}
+.sc h4{margin:0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sc p{margin:0} .sc ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.sc .say{border-left:3px solid var(--accent);padding-left:10px}
+.sc .private{font-size:13px;color:var(--muted)}
+.outcomes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.oc{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 6px;font-size:14px;font-weight:650;cursor:pointer;min-height:44px}
+.oc[aria-pressed="true"][data-s="hot"]{background:var(--hot);border-color:var(--hot);color:#fff}
+.oc[aria-pressed="true"][data-s="no"]{background:var(--no);border-color:var(--no);color:#fff}
+.oc[aria-pressed="true"][data-s="vm"]{background:var(--vm);border-color:var(--vm);color:#fff}
+.oc[aria-pressed="true"][data-s="na"]{background:var(--na);border-color:var(--na);color:#fff}
+.oc[aria-pressed="true"][data-s="cb"]{background:var(--cb);border-color:var(--cb);color:#fff}
+.oc[aria-pressed="true"][data-s="bad"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.sub{display:flex;flex-direction:column;gap:8px;background:var(--sunk);border-radius:8px;padding:10px}
+.sub label{font-size:13px;font-weight:600}
+.sub input[type="datetime-local"]{border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--surface);max-width:100%;font-size:16px}
+.checks{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:14px}
+.checks label{display:flex;gap:6px;align-items:center;font-weight:500}
+textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);resize:vertical;min-height:44px;font-size:16px}
+.foot{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);align-items:center}
+.foot label{display:flex;gap:5px;align-items:center;color:var(--ink);font-weight:600}
+.linkbtn{border:0;background:none;color:var(--accent);cursor:pointer;padding:0;font-size:12.5px;text-decoration:underline}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:6px}
+.empty h3{font-size:18px} .empty p{margin:0;color:var(--muted)}
+.dialbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.dialbar .left{font-size:14px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+.note{font-size:12.5px;color:var(--muted)}
+.saved{font-size:12px;color:var(--muted)}
+@media (min-width:640px){.outcomes{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="listing" aria-label="Your listing">
+    <div class="eyebrow">Your listing · MLS <a href="https://matrix.hicentralmls.com/Matrix/Display/GetDisplay?displayId=77&amp;key=19736821" target="_blank" rel="noopener">202618322</a></div>
+    <h1>94-213 Paioa Pl #J204 · Ho‘okumu at Waikele</h1>
+    <div class="facts"><b>$515,000</b><span>2 bd / 2 ba</span><span>830 sf + 90 sf lanai</span><span>Top-floor corner</span><span>2 stalls</span><span>Vacant</span></div>
+    <span class="tag">Assumable VA loan · 3.625%</span>
+  </section>
+
+  <section class="progress" aria-label="Progress">
+    <div class="stat"><span class="n" id="sCalled">0</span><span class="l" id="sCalledL">of 68 worked</span></div>
+    <div class="stat"><span class="n" id="sTalked">0</span><span class="l">talked</span></div>
+    <div class="stat hot"><span class="n" id="sHot">0</span><span class="l">have a buyer</span></div>
+    <div class="stat cb"><span class="n" id="sCb">0</span><span class="l">callbacks due</span></div>
+    <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+  </section>
+
+  <div class="toolbar">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="row">
+      <div class="seg" role="group" aria-label="Mode">
+        <button id="mDial" aria-pressed="true">Power dial</button>
+        <button id="mList" aria-pressed="false">List</button>
+      </div>
+      <div class="seg" role="group" aria-label="Filter" id="filterSeg">
+        <button data-f="todo" aria-pressed="true">To call</button>
+        <button data-f="all" aria-pressed="false">All</button>
+      </div>
+      <input id="q" class="search" type="search" placeholder="Find agent or number" autocomplete="off">
+    </div>
+  </div>
+
+  <main id="view"></main>
+  <p class="saved">Outcomes save on this phone only. Export from the Hot leads tab when you're done.</p>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const ME = { name: "Kalei Kekumano", phone: "(808) 234-8025" };
+const MATRIX = k => "https://matrix.hicentralmls.com/Matrix/Display/GetDisplay?displayId=77&key=" + encodeURIComponent(k);
+const OUTCOMES = [
+  { s: "hot", label: "Has a buyer", pill: "Has a buyer" },
+  { s: "no", label: "Talked, no buyer", pill: "No buyer" },
+  { s: "vm", label: "Left voicemail", pill: "Voicemail" },
+  { s: "na", label: "No answer", pill: "No answer" },
+  { s: "cb", label: "Call back", pill: "Call back" },
+  { s: "bad", label: "Bad number", pill: "Bad number" },
+];
+const OUT = Object.fromEntries(OUTCOMES.map(o => [o.s, o]));
+const TABS = [
+  { id: "pending", label: "Pending deals" },
+  { id: "sold", label: "Recent sales" },
+  { id: "hot", label: "Hot leads" },
+  { id: "cb", label: "Callbacks" },
+];
+const st = { agents: new Map(), calls: {}, tab: "pending", mode: "dial", filter: "todo", q: "", sticky: new Set(), dialId: null };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const digits = s => String(s || "").replace(/\D/g, "");
+const telHref = p => "tel:+1" + digits(p).slice(-10);
+const k$ = n => "$" + Math.round(n / 1000) + "K";
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const md = iso => { if (!iso) return ""; const [, m, d] = iso.split("-").map(Number); return MONTHS[m - 1] + " " + d; };
+const store = {
+  get(k, f) { try { const v = localStorage.getItem(k); return v == null ? f : JSON.parse(v); } catch { return f; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+};
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), 2400); }
+async function copy(text, label) {
+  try { await navigator.clipboard.writeText(text); toast(label || "Copied"); }
+  catch { toast("Copy was blocked. Press and hold the text to select it."); }
+}
+
+/* ---------- data from the link ---------- */
+function expand(rows) {
+  return rows.map(r => {
+    const [mlsId, order, g, name, phone, office, officePhone, flags, signals, coAgent, coPhone, L] = r;
+    return {
+      id: "a" + mlsId, order, group: g ? "sold" : "pending", name, first: name.split(" ")[0], phone, office, officePhone,
+      officeLine: !!(flags & 1), sameBrokerage: !!(flags & 2), signals: signals || [], coAgent, coPhone,
+      listings: L.map(l => ({ mls: l[0], key: l[1], street: l[2], city: l[3], building: l[4], status: l[5] ? "Sold" : "Pending",
+        listPrice: l[6], soldPrice: l[7], contractDate: l[8], closeDate: l[9], daysToContract: l[10] < 0 ? null : l[10], beds: l[11], baths: l[12], sqft: l[13] })),
+    };
+  });
+}
+async function decodePayload(b64) {
+  b64 = b64.replace(/-/g, "+").replace(/_/g, "/"); while (b64.length % 4) b64 += "=";
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const ds = new DecompressionStream("deflate-raw");
+  const text = await new Response(new Blob([bytes]).stream().pipeThrough(ds)).text();
+  return JSON.parse(text);
+}
+async function loadData() {
+  const m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/);
+  if (m) {
+    try { const rows = await decodePayload(m[1]); store.set("dialer.rows", rows); return rows; }
+    catch (e) { console.error(e); }
+  }
+  return store.get("dialer.rows", null);
+}
+
+/* ---------- scripts ---------- */
+const lead = a => a.listings[0];
+function opener(a) {
+  const l = lead(a);
+  if (l.status === "Pending") {
+    const fast = l.daysToContract != null && l.daysToContract <= 14 ? ` in just ${l.daysToContract} day${l.daysToContract === 1 ? "" : "s"}` : "";
+    return `Hi ${a.first}, it's Kalei Kekumano with eXp Realty. Got a quick minute? I saw ${l.street} went under contract${fast}. Congrats! Did you end up with multiple offers on that one?`;
+  }
+  const over = l.soldPrice && l.listPrice && l.soldPrice > l.listPrice ? ` for ${k$(l.soldPrice - l.listPrice)} over asking` : "";
+  return `Hi ${a.first}, it's Kalei Kekumano with eXp Realty. Got a quick minute? I saw you closed ${l.street}${over}. Congrats! Did you have other buyers who wanted it and missed out?`;
+}
+const PITCH = `Are any of them still looking? I just listed 94-213 Paioa Pl #J204 in Ho‘okumu at Waikele: top-floor corner, 2 bed / 2 bath, 830 sq ft plus a 90 sq ft lanai, two assigned stalls, golf course view, vacant. $515K. And the seller's VA loan is assumable at 3.625%.`;
+function voicemail(a) {
+  const l = lead(a);
+  const hook = l.status === "Pending" ? `Congrats on ${l.street} going into escrow.` : `Congrats on closing ${l.street}.`;
+  return `Hi ${a.first}, Kalei Kekumano with eXp Realty, ${ME.phone}. ${hook} I just listed a top-floor corner 2/2 at Ho‘okumu in Waikele with an assumable 3.625% VA loan, $515K. If any of your buyers missed out on ${l.street}, it could be a fit. I'll text you the MLS number. Again, ${ME.phone}.`;
+}
+function textMsg(a) {
+  const l = lead(a);
+  const hook = l.status === "Pending" ? `Congrats on ${l.street} going under contract!` : `Congrats on closing ${l.street}!`;
+  return `Hi ${a.first}, Kalei Kekumano with eXp Realty. ${hook} If you have buyers who missed out, I just listed 94-213 Paioa Pl #J204 (Ho‘okumu at Waikele): top-floor corner 2/2, 2 stalls, $515K, with an assumable VA loan at 3.625%. MLS 202618322. Happy to send details. ${ME.phone}`;
+}
+const smsHref = a => "sms:+1" + digits(a.phone).slice(-10) + "&body=" + encodeURIComponent(textMsg(a));
+function scriptHTML(a) {
+  return `<div class="sc">
+    <div><h4>Open</h4><p class="say">${esc(opener(a))}</p></div>
+    <div><h4>If yes, pitch</h4><p class="say">${esc(PITCH)}</p>
+      <p class="private">Agent-only: about $273K loan balance, about $1,798/mo P&amp;I, about $242K down to assume at list. Lender and VA approval required; buyer pays assumption fees.</p></div>
+    <div><h4>Qualify their buyer</h4><ul>
+      <li>Do they have roughly $240K to put down, or cash coming from a sale?</li>
+      <li>Is the buyer a veteran? A veteran can substitute their own VA entitlement.</li>
+      <li>Want to see it? I need 8 hours' notice and I'll be there (SentriKey).</li></ul></div>
+    <div><h4>Close</h4><p class="say">I'll text you the MLS number right now so it's handy.</p></div>
+    <div><h4>Voicemail</h4><p class="say">${esc(voicemail(a))}</p></div>
+    <div><h4>If they say…</h4><ul>
+      <li><b>"No buyers right now."</b> No problem. If someone comes up in Central or Waikele under $550K, think of me. I'll text the MLS number so you have it.</li>
+      <li><b>"My buyer can't put $240K down."</b> That's fine. It works as a regular sale at $515K with their own financing. The assumption is a bonus for the right buyer.</li>
+      <li><b>"Just send me the details."</b> Will do. Texting the MLS number now, and I can email the assumption numbers too.</li></ul></div>
+  </div>`;
+}
+
+/* ---------- cards ---------- */
+function listingHTML(l) {
+  const price = l.status === "Sold"
+    ? `Sold ${k$(l.soldPrice || l.listPrice)}${l.soldPrice && l.listPrice && l.soldPrice !== l.listPrice ? ` (list ${k$(l.listPrice)})` : ""} · closed ${md(l.closeDate)}`
+    : `List ${k$(l.listPrice)} · offer accepted ${md(l.contractDate)}`;
+  const dtc = l.daysToContract != null ? ` · ${l.daysToContract} days to contract` : "";
+  return `<li><a class="mls" href="${MATRIX(l.key)}" target="_blank" rel="noopener">${esc(l.mls)}</a>
+    <span class="addr"><span class="st ${l.status === "Pending" ? "p" : "s"}">${l.status}</span>${esc(l.street)}, ${esc(l.city)}</span>
+    <span class="meta">${esc(l.building)} · ${esc(l.beds)} bd / ${esc(l.baths)} ba · ${Number(l.sqft).toLocaleString()} sf · ${price}${dtc}</span></li>`;
+}
+function buildCard(a, dial) {
+  const el = document.createElement("article");
+  el.className = "card"; el.dataset.id = a.id;
+  const chips = a.signals.map(s => `<span class="chip">${esc(s)}</span>`);
+  if (a.listings.length > 1) chips.push(`<span class="chip">${a.listings.length} deals in your area</span>`);
+  if (a.sameBrokerage) chips.push(`<span class="chip team">eXp teammate</span>`);
+  if (a.officeLine) chips.push(`<span class="chip warn">Office line: ask for ${esc(a.first)}</span>`);
+  const sfx = dial ? "d" : "l";
+  el.innerHTML = `
+    <div class="head"><span class="order">#${a.order}</span>
+      <div class="who"><h3 class="name">${esc(a.name)}</h3><div class="office">${esc(a.office)} · office ${esc(a.officePhone)}</div></div>
+      <span class="pill" data-role="pill">Not called</span></div>
+    ${chips.length ? `<div class="chips">${chips.join("")}</div>` : ""}
+    <a class="phone" href="${telHref(a.phone)}">${esc(a.phone)}</a>
+    <div class="actions">
+      <a class="big call" href="${telHref(a.phone)}" data-act="call">Call</a>
+      <a class="big text" href="${smsHref(a)}" data-act="sms">Text</a>
+    </div>
+    ${a.coAgent ? `<div class="co">Co-listing: ${esc(a.coAgent)} · <a href="${telHref(a.coPhone)}">${esc(a.coPhone)}</a></div>` : ""}
+    <ul class="listings">${a.listings.map(listingHTML).join("")}</ul>
+    <details class="script"${dial ? " open" : ""}><summary>Script for ${esc(a.first)}</summary>${scriptHTML(a)}</details>
+    <div class="outcomes" role="group" aria-label="Call outcome">
+      ${OUTCOMES.map(o => `<button class="oc" data-s="${o.s}" aria-pressed="false">${o.label}</button>`).join("")}
+    </div>
+    <div class="sub" data-role="cbRow" hidden>
+      <label for="cb-${sfx}-${a.id}">Call back at</label>
+      <input type="datetime-local" id="cb-${sfx}-${a.id}" data-role="cbAt">
+      <div class="row"><button class="btn" data-quick="2h">In 2 hours</button><button class="btn" data-quick="tm9">Tomorrow 9 AM</button><button class="btn" data-quick="tm1">Tomorrow 1 PM</button></div>
+    </div>
+    <div class="sub" data-role="hotRow" hidden>
+      <div class="checks">
+        <label><input type="checkbox" data-flag="vet"> Veteran buyer</label>
+        <label><input type="checkbox" data-flag="cash"> Has ~$240K+ down</label>
+        <label><input type="checkbox" data-flag="showing"> Wants a showing</label>
+      </div>
+      <label for="bn-${sfx}-${a.id}">About their buyer</label>
+      <textarea id="bn-${sfx}-${a.id}" data-field="buyerNote" rows="2" placeholder="Budget, financing, timeline, must-haves"></textarea>
+    </div>
+    <label class="note" for="nt-${sfx}-${a.id}">Notes</label>
+    <textarea id="nt-${sfx}-${a.id}" data-field="note" rows="1" placeholder="Anything to remember for the next call"></textarea>
+    <div class="foot"><label><input type="checkbox" data-flag="texted"> Texted</label><span data-role="meta"></span><button class="btn" data-act="copyText" style="min-height:32px;padding:4px 10px;font-size:12.5px">Copy text</button><button class="linkbtn" data-act="reset" hidden>Clear outcome</button></div>`;
+  el.addEventListener("click", e => onCardClick(e, a));
+  el.addEventListener("change", e => onCardChange(e, a));
+  el.addEventListener("input", e => onCardInput(e, a));
+  updateCard(el, a);
+  return el;
+}
+function timeAgo(ms) {
+  const m = Math.round((Date.now() - ms) / 60000);
+  if (m < 1) return "just now"; if (m < 60) return m + " min ago";
+  return new Date(ms).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+const cbLabel = v => { const d = new Date(v); return isNaN(d) ? v : d.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" }); };
+function updateCard(el, a) {
+  const c = st.calls[a.id] || {};
+  el.dataset.tone = c.status || "";
+  const pill = el.querySelector('[data-role="pill"]');
+  pill.dataset.tone = c.status || "";
+  pill.textContent = c.status ? (c.status === "cb" && c.callbackAt ? "Call back " + cbLabel(c.callbackAt) : OUT[c.status].pill) : "Not called";
+  el.querySelectorAll(".oc").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.s === c.status)));
+  el.querySelector('[data-role="cbRow"]').hidden = c.status !== "cb";
+  el.querySelector('[data-role="hotRow"]').hidden = c.status !== "hot";
+  const cbIn = el.querySelector('[data-role="cbAt"]');
+  if (document.activeElement !== cbIn) cbIn.value = c.callbackAt || "";
+  el.querySelectorAll("[data-flag]").forEach(x => { x.checked = !!c[x.dataset.flag]; });
+  el.querySelectorAll("textarea[data-field]").forEach(t => { if (document.activeElement !== t) t.value = c[t.dataset.field] || ""; });
+  const meta = [];
+  if (c.attempts) meta.push(`${c.attempts} attempt${c.attempts === 1 ? "" : "s"}`);
+  if (c.lastAt) meta.push("last " + timeAgo(c.lastAt));
+  el.querySelector('[data-role="meta"]').textContent = meta.join(" · ");
+  el.querySelector('[data-act="reset"]').hidden = !c.status;
+}
+const cards = new Map(); let dialCard = null;
+function refreshCard(id) {
+  const a = st.agents.get(id); if (!a) return;
+  const el = cards.get(id); if (el) updateCard(el, a);
+  if (dialCard && dialCard.dataset.id === id) updateCard(dialCard, a);
+}
+function patch(id, p) {
+  st.calls[id] = { ...(st.calls[id] || {}), ...p };
+  st.sticky.add(id);
+  if (!store.set("dialer.calls", st.calls)) toast("Couldn't save on this phone. Use Export to keep a copy.");
+  refreshCard(id); renderCounts();
+}
+function logOutcome(a, s) {
+  const c = st.calls[a.id] || {};
+  if (c.status === s) return;
+  const now = Date.now();
+  const fresh = !c.lastAt || now - c.lastAt > 5 * 60000;
+  patch(a.id, { status: s, lastAt: now, attempts: (c.attempts || 0) + (fresh ? 1 : 0), log: [...(c.log || []), { t: now, s }].slice(-20) });
+}
+function onCardClick(e, a) {
+  const link = e.target.closest("a[data-act]");
+  if (link && link.dataset.act === "sms") {
+    try { navigator.clipboard.writeText(textMsg(a)).catch(() => {}); } catch {}
+    setTimeout(() => { if (!(st.calls[a.id] || {}).texted) patch(a.id, { textOpenedAt: Date.now() }); }, 0);
+    return;
+  }
+  if (link) return;
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.classList.contains("oc")) { logOutcome(a, b.dataset.s); if (b.dataset.s === "vm" || b.dataset.s === "na") toast(`Logged. Tap Text to send ${a.first} the follow-up.`); return; }
+  if (b.dataset.quick) {
+    const d = new Date();
+    if (b.dataset.quick === "2h") d.setHours(d.getHours() + 2);
+    else { d.setDate(d.getDate() + 1); d.setHours(b.dataset.quick === "tm9" ? 9 : 13, 0, 0, 0); }
+    const pad = n => String(n).padStart(2, "0");
+    patch(a.id, { callbackAt: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}` });
+    return;
+  }
+  if (b.dataset.act === "copyText") copy(textMsg(a), "Text copied");
+  if (b.dataset.act === "reset") patch(a.id, { status: null, callbackAt: null });
+}
+function onCardChange(e, a) {
+  const t = e.target;
+  if (t.dataset.flag) patch(a.id, { [t.dataset.flag]: t.checked });
+  if (t.dataset.role === "cbAt") patch(a.id, { callbackAt: t.value || null });
+}
+let noteT = {};
+function onCardInput(e, a) {
+  const t = e.target; if (!t.dataset.field) return;
+  clearTimeout(noteT[a.id]);
+  const field = t.dataset.field, val = t.value;
+  noteT[a.id] = setTimeout(() => patch(a.id, { [field]: val }), 400);
+}
+
+/* ---------- views ---------- */
+const isDue = c => c && c.status === "cb" && c.callbackAt && new Date(c.callbackAt).getTime() <= Date.now() + 10 * 60000;
+function inTab(a, tab) {
+  const c = st.calls[a.id];
+  if (tab === "hot") return c && c.status === "hot";
+  if (tab === "cb") return c && c.status === "cb";
+  return a.group === tab;
+}
+function matchesQ(a) {
+  if (!st.q) return true;
+  const q = st.q.toLowerCase(), qd = digits(st.q);
+  return a.name.toLowerCase().includes(q) || a.office.toLowerCase().includes(q) ||
+    (qd.length >= 3 && (digits(a.phone).includes(qd) || digits(a.coPhone).includes(qd))) ||
+    a.listings.some(l => l.street.toLowerCase().includes(q) || l.mls.includes(q));
+}
+const todo = a => { const c = st.calls[a.id]; return !c || !c.status || isDue(c) || c.status === "na"; };
+function ordered(tab) {
+  const arr = [...st.agents.values()].filter(a => (st.q ? true : inTab(a, tab)) && matchesQ(a));
+  if (tab === "cb" && !st.q) arr.sort((x, y) => String(st.calls[x.id]?.callbackAt || "9").localeCompare(String(st.calls[y.id]?.callbackAt || "9")));
+  else arr.sort((x, y) => (x.group === y.group ? x.order - y.order : x.group === "pending" ? -1 : 1));
+  return arr;
+}
+const emptyHTML = (t, b) => `<div class="empty"><h3>${t}</h3><p>${b}</p></div>`;
+function render() {
+  renderTabs(); renderCounts();
+  const view = $("#view");
+  if (!st.agents.size) { view.innerHTML = emptyHTML("No agent list on this phone yet", "Open this page from the full link Claude gave you. The agent list is inside that link."); return; }
+  if (st.tab === "hot" && !st.q) return renderHot(view);
+  if (st.mode === "dial" && st.tab !== "cb") return renderDial(view);
+  const list = document.createElement("div"); list.className = "list";
+  let shown = 0;
+  for (const a of ordered(st.tab)) {
+    const show = st.q || st.filter === "all" || st.tab === "cb" || todo(a) || st.sticky.has(a.id);
+    if (!show) continue;
+    let el = cards.get(a.id);
+    if (!el) { el = buildCard(a, false); cards.set(a.id, el); } else updateCard(el, a);
+    list.appendChild(el); shown++;
+  }
+  view.replaceChildren(list);
+  if (!shown) view.innerHTML = st.q ? emptyHTML("No match", `Nobody matches “${esc(st.q)}”.`)
+    : st.tab === "cb" ? emptyHTML("No callbacks scheduled", "Tap Call back on a card and pick a time. They line up here, soonest first.")
+    : emptyHTML("Everyone here has been called", "Switch the filter to All to review, or move to the next tab.");
+}
+function dialQueue() { return ordered(st.tab).filter(a => todo(a) || a.id === st.dialId); }
+function renderDial(view) {
+  const q = dialQueue();
+  if (!q.length) { view.innerHTML = emptyHTML("Queue cleared", "Everyone in this tab has an outcome. Pick another tab, or check Callbacks."); dialCard = null; return; }
+  if (!st.dialId || !q.some(a => a.id === st.dialId)) st.dialId = q[0].id;
+  const a = st.agents.get(st.dialId);
+  const idx = q.findIndex(x => x.id === a.id);
+  const wrap = document.createElement("div"); wrap.className = "list";
+  const bar = document.createElement("div"); bar.className = "dialbar";
+  bar.innerHTML = `<span class="left">${idx + 1} of ${q.length} to call</span><span class="row"><button class="btn" id="dPrev">Back</button><button class="btn primary" id="dNext">Next agent</button></span>`;
+  if (!dialCard || dialCard.dataset.id !== a.id) dialCard = buildCard(a, true); else updateCard(dialCard, a);
+  wrap.append(bar, dialCard);
+  view.replaceChildren(wrap);
+  $("#dNext").onclick = () => { const qq = dialQueue(); const i = qq.findIndex(x => x.id === a.id); const nx = qq[i + 1] || qq.find(x => x.id !== a.id); st.dialId = nx ? nx.id : null; st.sticky.clear(); render(); window.scrollTo({ top: 0 }); };
+  $("#dPrev").onclick = () => { const qq = ordered(st.tab); const i = qq.findIndex(x => x.id === a.id); if (i > 0) { st.dialId = qq[i - 1].id; render(); window.scrollTo({ top: 0 }); } };
+}
+function hotSummary() {
+  return [...st.agents.values()].filter(a => st.calls[a.id]?.status === "hot").sort((x, y) => x.order - y.order).map(a => {
+    const c = st.calls[a.id];
+    const flags = [c.vet && "veteran", c.cash && "has ~$240K+ down", c.showing && "wants a showing"].filter(Boolean).join(", ");
+    return `${a.name} (${a.office}) ${a.phone}${flags ? " | " + flags : ""}${c.buyerNote ? " | " + c.buyerNote : ""}${c.note ? " | note: " + c.note : ""}`;
+  }).join("\n");
+}
+function csv() {
+  const head = ["Order", "Group", "Agent", "Office", "Phone", "Outcome", "Call back at", "Attempts", "Last called", "Texted", "Veteran", "Has 240K down", "Wants showing", "Buyer notes", "Notes", "MLS numbers"];
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = [...st.agents.values()].sort((x, y) => (x.group === y.group ? x.order - y.order : x.group === "pending" ? -1 : 1)).map(a => {
+    const c = st.calls[a.id] || {};
+    return [a.order, a.group, a.name, a.office, a.phone, c.status ? OUT[c.status].label : "Not called", c.callbackAt || "", c.attempts || 0,
+      c.lastAt ? new Date(c.lastAt).toLocaleString() : "", c.texted ? "yes" : "", c.vet ? "yes" : "", c.cash ? "yes" : "", c.showing ? "yes" : "",
+      c.buyerNote || "", c.note || "", a.listings.map(l => l.mls).join(" ")].map(q).join(",");
+  });
+  return [head.map(q).join(","), ...rows].join("\n");
+}
+async function shareCsv() {
+  const data = csv();
+  try {
+    const file = new File([data], "paioa-j204-call-results.csv", { type: "text/csv" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: "Paioa J204 call results" }); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  copy(data, "CSV copied");
+}
+function renderHot(view) {
+  const wrap = document.createElement("div"); wrap.className = "list";
+  const bar = document.createElement("div"); bar.className = "row";
+  bar.innerHTML = `<button class="btn primary" id="copyHot">Copy hot-lead summary</button><button class="btn" id="shareCsv">Share results (CSV)</button><button class="btn" id="copyCsv">Copy CSV</button>`;
+  wrap.append(bar);
+  const hot = ordered("hot");
+  if (!hot.length) wrap.insertAdjacentHTML("beforeend", emptyHTML("No hot leads yet", "When an agent says they have a buyer, tap Has a buyer. Their card lands here with the buyer details you capture."));
+  for (const a of hot) { let el = cards.get(a.id); if (!el) { el = buildCard(a, false); cards.set(a.id, el); } else updateCard(el, a); wrap.append(el); }
+  view.replaceChildren(wrap);
+  $("#copyHot").onclick = () => { const s = hotSummary(); s ? copy("Paioa J204 hot leads\n" + s, "Summary copied") : toast("No hot leads yet"); };
+  $("#shareCsv").onclick = shareCsv;
+  $("#copyCsv").onclick = () => copy(csv(), "CSV copied");
+}
+function renderTabs() {
+  const counts = { pending: 0, sold: 0, hot: 0, cb: 0 };
+  for (const a of st.agents.values()) {
+    counts[a.group]++;
+    const c = st.calls[a.id];
+    if (c?.status === "hot") counts.hot++;
+    if (c?.status === "cb") counts.cb++;
+  }
+  $("#tabs").innerHTML = TABS.map(t => `<button class="tab" role="tab" data-t="${t.id}" aria-selected="${st.tab === t.id}">${t.label}<span class="c">${counts[t.id]}</span></button>`).join("");
+}
+function renderCounts() {
+  let worked = 0, talked = 0, hot = 0, due = 0;
+  for (const a of st.agents.values()) {
+    const c = st.calls[a.id]; if (!c || !c.status) continue;
+    worked++; if (c.status === "hot" || c.status === "no") talked++; if (c.status === "hot") hot++; if (isDue(c)) due++;
+  }
+  const total = st.agents.size || 68;
+  $("#sCalled").textContent = worked; $("#sCalledL").textContent = `of ${total} worked`;
+  $("#sTalked").textContent = talked; $("#sHot").textContent = hot; $("#sCb").textContent = due;
+  $("#bar").style.width = Math.round((worked / total) * 100) + "%";
+  document.querySelectorAll("#tabs .tab").forEach(b => {
+    const c = b.querySelector(".c");
+    if (b.dataset.t === "hot") c.textContent = hot;
+    if (b.dataset.t === "cb") c.textContent = Object.values(st.calls).filter(x => x.status === "cb").length;
+  });
+}
+
+/* ---------- toolbar ---------- */
+$("#tabs").addEventListener("click", e => { const b = e.target.closest(".tab"); if (!b) return; st.tab = b.dataset.t; st.sticky.clear(); st.dialId = null; render(); });
+function setMode(m) { st.mode = m; $("#mDial").setAttribute("aria-pressed", String(m === "dial")); $("#mList").setAttribute("aria-pressed", String(m === "list")); st.dialId = null; render(); }
+$("#mDial").onclick = () => setMode("dial");
+$("#mList").onclick = () => setMode("list");
+$("#filterSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; st.filter = b.dataset.f; document.querySelectorAll("#filterSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); st.sticky.clear(); render(); });
+let qT; $("#q").addEventListener("input", e => { clearTimeout(qT); qT = setTimeout(() => { st.q = e.target.value.trim(); render(); }, 150); });
+setInterval(renderCounts, 60000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { renderCounts(); if (dialCard) refreshCard(dialCard.dataset.id); } });
+
+/* ---------- start ---------- */
+(async () => {
+  st.calls = store.get("dialer.calls", {});
+  const rows = await loadData();
+  if (rows) st.agents = new Map(expand(rows).map(a => [a.id, a]));
+  render();
+})();
+</script>
+</body>
+</html>
