@@ -297,10 +297,16 @@ function voicemail(a) {
   const hook = l.status === "Pending" ? `Congrats on ${l.street} going into escrow.` : `Congrats on closing ${l.street}.`;
   return `Hi ${a.first}, Kalei Kekumano with eXp Realty, ${ME.phone}. ${hook} I just listed a top-floor corner 2/2 at Ho‘okumu in Waikele with an assumable 3.625% VA loan, $515K. If any of your buyers missed out on ${l.street}, it could be a fit. I'll text you the MLS number. Again, ${ME.phone}.`;
 }
+function overK(n) { return n % 1000 === 0 ? "$" + (n / 1000) + "K" : "$" + (n / 1000).toFixed(1) + "K"; }
 function textMsg(a) {
   const l = lead(a);
-  const hook = l.status === "Pending" ? `Congrats on ${l.street} going under contract!` : `Congrats on closing ${l.street}!`;
-  return `Hi ${a.first}, Kalei Kekumano with eXp Realty. ${hook} If you have buyers who missed out, I just listed 94-213 Paioa Pl #J204 (Ho‘okumu at Waikele): top-floor corner 2/2, 2 stalls, $515K, with an assumable VA loan at 3.625%. MLS 202618322. Happy to send details. ${ME.phone}`;
+  if (l.status === "Pending") {
+    const d = l.daysToContract;
+    const fast = d == null || d > 21 ? "" : d === 0 ? " the same day it listed" : ` in ${d} day${d === 1 ? "" : "s"}`;
+    return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on ${l.street} going under contract${fast}! I'm reaching out to ask if you've received multiple offers on the property?`;
+  }
+  const over = l.soldPrice && l.listPrice && l.soldPrice > l.listPrice ? ` for ${overK(l.soldPrice - l.listPrice)} over asking` : "";
+  return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on closing ${l.street}${over}! I'm reaching out to ask if you had any other buyers who missed out on it?`;
 }
 const smsHref = a => "sms:+1" + digits(a.phone).slice(-10) + "&body=" + encodeURIComponent(textMsg(a));
 function scriptHTML(a) {
