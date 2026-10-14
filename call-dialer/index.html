@@ -165,6 +165,7 @@ textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 1
 
   <main id="view"></main>
   <p class="saved">Outcomes save on this phone only. Export from the Hot leads tab when you're done.</p>
+  <div class="row" id="homeCopyRow" hidden><button class="btn" id="homeCopy">Copy link for Home Screen app</button></div>
 </div>
 <div id="toast" class="toast" hidden></div>
 
@@ -223,13 +224,59 @@ async function decodePayload(b64) {
   const text = await new Response(new Blob([bytes]).stream().pipeThrough(ds)).text();
   return JSON.parse(text);
 }
+async function loadPayload(payload) {
+  const rows = await decodePayload(payload);
+  if (!Array.isArray(rows) || !rows.length) throw new Error("empty");
+  store.set("dialer.rows", rows); store.set("dialer.payload", payload);
+  return rows;
+}
 async function loadData() {
   const m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/);
   if (m) {
-    try { const rows = await decodePayload(m[1]); store.set("dialer.rows", rows); return rows; }
+    try { return await loadPayload(m[1]); }
     catch (e) { console.error(e); }
   }
   return store.get("dialer.rows", null);
+}
+async function loadFromText(text) {
+  const m = String(text || "").match(/d=([A-Za-z0-9_-]{200,})/);
+  if (!m) { toast("That doesn't look like your dialer link. Copy the whole link and try again."); return false; }
+  try {
+    const rows = await loadPayload(m[1]);
+    st.agents = new Map(expand(rows).map(a => [a.id, a]));
+    cards.clear(); dialCard = null; render(); updateHomeCopy();
+    toast(`Loaded ${st.agents.size} agents`);
+    return true;
+  } catch { toast("That link didn't load. Copy the whole link and try again."); return false; }
+}
+function homeLink() {
+  const p = store.get("dialer.payload", null);
+  return p ? location.origin + location.pathname + "#d=" + p : null;
+}
+function updateHomeCopy() {
+  const standalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
+  $("#homeCopyRow").hidden = standalone || !homeLink();
+}
+function renderSetup(view) {
+  view.innerHTML = `<div class="empty">
+    <h3>Load your agent list</h3>
+    <p>This Home Screen app keeps its own storage, separate from Safari, so it needs your dialer link one time.</p>
+    <ol style="margin:4px 0 0;padding-left:20px;color:var(--muted);display:flex;flex-direction:column;gap:4px">
+      <li>Open your dialer link in Safari, using the call sheet's Open phone dialer button or phone-dialer-link.txt.</li>
+      <li>At the bottom of that page, tap <b>Copy link for Home Screen app</b>.</li>
+      <li>Come back here and tap <b>Paste link</b>.</li>
+    </ol>
+    <div class="row" style="margin-top:8px"><button class="btn primary" id="pasteLink">Paste link</button></div>
+    <label class="note" for="linkBox" style="margin-top:6px">Or paste it into this box</label>
+    <textarea id="linkBox" rows="3" placeholder="https://kkekumano29.github.io/…#d=…"></textarea>
+    <div class="row"><button class="btn" id="loadLink">Load list</button></div>
+  </div>`;
+  $("#pasteLink").onclick = async () => {
+    try { const t = await navigator.clipboard.readText(); if (!(await loadFromText(t))) $("#linkBox").focus(); }
+    catch { toast("Paste was blocked. Press and hold in the box below, then tap Paste."); $("#linkBox").focus(); }
+  };
+  $("#loadLink").onclick = () => loadFromText($("#linkBox").value);
+  $("#linkBox").addEventListener("paste", () => setTimeout(() => loadFromText($("#linkBox").value), 50));
 }
 
 /* ---------- scripts ---------- */
@@ -434,7 +481,7 @@ const emptyHTML = (t, b) => `<div class="empty"><h3>${t}</h3><p>${b}</p></div>`;
 function render() {
   renderTabs(); renderCounts();
   const view = $("#view");
-  if (!st.agents.size) { view.innerHTML = emptyHTML("No agent list on this phone yet", "Open this page from the full link Claude gave you. The agent list is inside that link."); return; }
+  if (!st.agents.size) { renderSetup(view); return; }
   if (st.tab === "hot" && !st.q) return renderHot(view);
   if (st.mode === "dial" && st.tab !== "cb") return renderDial(view);
   const list = document.createElement("div"); list.className = "list";
@@ -548,8 +595,9 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) { re
   st.calls = store.get("dialer.calls", {});
   const rows = await loadData();
   if (rows) st.agents = new Map(expand(rows).map(a => [a.id, a]));
-  render();
+  render(); updateHomeCopy();
 })();
+$("#homeCopy").onclick = () => { const l = homeLink(); if (l) copy(l, "Link copied. Now open the Home Screen app and tap Paste link."); };
 </script>
 </body>
 </html>
