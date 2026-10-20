@@ -282,7 +282,7 @@ function normalize(data) {
   if (!data || !Array.isArray(data.r) || !data.r.length) throw new Error("no agents");
   const me = { name: "", first: "", brokerage: "", phone: "", ...(data.me || {}) };
   if (!me.first) me.first = (me.name || "").split(" ")[0];
-  if (!me.team) me.team = (me.brokerage || "").split(" ")[0] + " teammate";
+  if (!me.team) me.team = "Same brokerage";
   return { v: 2, me, s: { facts: [], ...(data.s || {}) }, p: { ...GENERIC, ...(data.p || {}) }, r: data.r };
 }
 function applyConfig(cfg) {
