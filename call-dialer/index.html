@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Call Sheet">
 <meta name="theme-color" content="#f7f2e8">
-<title>Paioa J204 Dialer</title>
+<title>Call Sheet Dialer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -134,15 +134,15 @@ textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 1
 </head>
 <body>
 <div class="wrap">
-  <section class="listing" aria-label="Your listing">
-    <div class="eyebrow">Your listing · MLS <a href="https://matrix.hicentralmls.com/Matrix/Display/GetDisplay?displayId=77&amp;key=19736821" target="_blank" rel="noopener">202618322</a></div>
-    <h1>94-213 Paioa Pl #J204 · Ho‘okumu at Waikele</h1>
-    <div class="facts"><b>$515,000</b><span>2 bd / 2 ba</span><span>830 sf + 90 sf lanai</span><span>Top-floor corner</span><span>2 stalls</span><span>Vacant</span></div>
-    <span class="tag">Assumable VA loan · 3.625%</span>
+  <section class="listing" id="hero" aria-label="Your listing" hidden>
+    <div class="eyebrow">Your listing · MLS <a id="heroMls" href="#" target="_blank" rel="noopener"></a></div>
+    <h1 id="heroTitle"></h1>
+    <div class="facts" id="heroFacts"></div>
+    <span class="tag" id="heroTag" hidden></span>
   </section>
 
   <section class="progress" aria-label="Progress">
-    <div class="stat"><span class="n" id="sCalled">0</span><span class="l" id="sCalledL">of 68 worked</span></div>
+    <div class="stat"><span class="n" id="sCalled">0</span><span class="l" id="sCalledL">worked</span></div>
     <div class="stat"><span class="n" id="sTalked">0</span><span class="l">talked</span></div>
     <div class="stat hot"><span class="n" id="sHot">0</span><span class="l">have a buyer</span></div>
     <div class="stat cb"><span class="n" id="sCb">0</span><span class="l">callbacks due</span></div>
@@ -171,8 +171,58 @@ textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 1
 <div id="toast" class="toast" hidden></div>
 
 <script>
-const ME = { name: "Kalei Kekumano", phone: "(808) 234-8025" };
+/* Call Sheet Dialer. The page holds no data: the agent list, the listing and the
+   wording all ride in the link after "#d=" (never sent to the server).
+   v1 links (a bare array) are Kalei's Paioa J204 campaign; v2 links carry their own config. */
 const MATRIX = k => "https://matrix.hicentralmls.com/Matrix/Display/GetDisplay?displayId=77&key=" + encodeURIComponent(k);
+
+const GENERIC = {
+  fastDays: 21, openFastDays: 21,
+  textPending: "Hey {agent}, this is {meFirst} with {brokerage}. Congrats on {address} going under contract{fast}! I'm reaching out to see if any other buyers got left out. Did you receive multiple offers on the property?",
+  textClosed: "Hey {agent}, this is {meFirst} with {brokerage}. Congrats on closing {address}{over}! I'm reaching out to see if any other buyers got left out. Did you receive multiple offers on the property?",
+  openPending: "Hey {agent}, it's {meFirst} with {brokerage}. Got a quick minute? Congrats on {address} going under contract{fastJust}! Did you end up getting multiple offers?",
+  openClosed: "Hey {agent}, it's {meFirst} with {brokerage}. Got a quick minute? Congrats on closing {address}{over}! Did you have other buyers who missed out on it?",
+  namesAsk: "Nice! Who were the other agents that wrote on it? I just listed {pitchShort}, and I'd love to see if any of their buyers are still looking. Just names is fine, I can look them up.",
+  pitch: "I just listed {subject}. Want me to send it over?",
+  agentOnly: "",
+  qualify: ["How are they financing, and are they pre-approved?", "What's their timeline?", "Want to see it? I can set up a showing."],
+  close: "I'll text you the MLS number right now so it's handy.",
+  vmPending: "Hi {agent}, {meName} with {brokerage}, {phone}. Congrats on {address} going into escrow. I just listed {vmPitch}. If any of your buyers missed out on {address}, it could be a fit. I'll text you the MLS number. Again, {phone}.",
+  vmClosed: "Hi {agent}, {meName} with {brokerage}, {phone}. Congrats on closing {address}. I just listed {vmPitch}. If any of your buyers missed out on {address}, it could be a fit. I'll text you the MLS number. Again, {phone}.",
+  objections: [
+    ["No buyers right now.", "No problem. If someone comes up looking in {area} around {price}, think of me. I'll text you the MLS number so you have it."],
+    ["I'd rather not share who wrote.", "Totally understand. Would you mind passing my listing along to them instead? I'll text you the MLS number."],
+    ["Just send me the details.", "Will do. Texting you the MLS number now."],
+  ],
+  flags: [["pre", "Pre-approved", "pre-approved"], ["cash", "Cash or big down payment", "cash/big down"], ["showing", "Wants a showing", "wants a showing"]],
+  vmPitch: "", pitchShort: "", area: "the area",
+};
+
+const KALEI_V1 = {
+  v: 1,
+  me: { name: "Kalei Kekumano", first: "Kalei", brokerage: "eXp Realty", phone: "(808) 234-8025", team: "eXp teammate" },
+  s: { mls: "202618322", key: "19736821", short: "Paioa J204", street: "94-213 Paioa Pl #J204", building: "Ho‘okumu at Waikele", price: 515000,
+       facts: ["2 bd / 2 ba", "830 sf + 90 sf lanai", "Top-floor corner", "2 stalls", "Vacant"], tag: "Assumable VA loan · 3.625%" },
+  p: {
+    fastDays: 21, openFastDays: 14,
+    openPending: "Hi {agent}, it's {meName} with {brokerage}. Got a quick minute? I saw {address} went under contract{fastJust}. Congrats! Did you end up with multiple offers on that one?",
+    openClosed: "Hi {agent}, it's {meName} with {brokerage}. Got a quick minute? I saw you closed {address}{over}. Congrats! Did you have other buyers who wanted it and missed out?",
+    namesAsk: "",
+    pitch: "Are any of them still looking? I just listed 94-213 Paioa Pl #J204 in Ho‘okumu at Waikele: top-floor corner, 2 bed / 2 bath, 830 sq ft plus a 90 sq ft lanai, two assigned stalls, golf course view, vacant. $515K. And the seller's VA loan is assumable at 3.625%.",
+    agentOnly: "Agent-only: about $273K loan balance, about $1,798/mo P&I, about $242K down to assume at list. Lender and VA approval required; buyer pays assumption fees.",
+    qualify: ["Do they have roughly $240K to put down, or cash coming from a sale?", "Is the buyer a veteran? A veteran can substitute their own VA entitlement.", "Want to see it? I need 8 hours' notice and I'll be there (SentriKey)."],
+    vmPitch: "a top-floor corner 2/2 at Ho‘okumu in Waikele with an assumable 3.625% VA loan, $515K",
+    objections: [
+      ["No buyers right now.", "No problem. If someone comes up in Central or Waikele under $550K, think of me. I'll text the MLS number so you have it."],
+      ["My buyer can't put $240K down.", "That's fine. It works as a regular sale at $515K with their own financing. The assumption is a bonus for the right buyer."],
+      ["Just send me the details.", "Will do. Texting the MLS number now, and I can email the assumption numbers too."],
+    ],
+    flags: [["vet", "Veteran buyer", "veteran"], ["cash", "Has ~$240K+ down", "has ~$240K+ down"], ["showing", "Wants a showing", "wants a showing"]],
+  },
+};
+
+let CFG = null; // { v, me, s, p, r }
+let CALLS_KEY = "dialer.calls";
 const OUTCOMES = [
   { s: "hot", label: "Has a buyer", pill: "Has a buyer" },
   { s: "no", label: "Talked, no buyer", pill: "No buyer" },
@@ -194,6 +244,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": 
 const digits = s => String(s || "").replace(/\D/g, "");
 const telHref = p => "tel:+1" + digits(p).slice(-10);
 const k$ = n => "$" + Math.round(n / 1000) + "K";
+const money = n => n ? "$" + Number(n).toLocaleString("en-US") : "";
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const md = iso => { if (!iso) return ""; const [, m, d] = iso.split("-").map(Number); return MONTHS[m - 1] + " " + d; };
 const store = {
@@ -225,11 +276,28 @@ async function decodePayload(b64) {
   const text = await new Response(new Blob([bytes]).stream().pipeThrough(ds)).text();
   return JSON.parse(text);
 }
+/* Turn a decoded payload (v1 array or v2 object) into a full config. */
+function normalize(data) {
+  if (Array.isArray(data)) return { ...KALEI_V1, p: { ...GENERIC, ...KALEI_V1.p }, r: data };
+  if (!data || !Array.isArray(data.r) || !data.r.length) throw new Error("no agents");
+  const me = { name: "", first: "", brokerage: "", phone: "", ...(data.me || {}) };
+  if (!me.first) me.first = (me.name || "").split(" ")[0];
+  if (!me.team) me.team = (me.brokerage || "").split(" ")[0] + " teammate";
+  return { v: 2, me, s: { facts: [], ...(data.s || {}) }, p: { ...GENERIC, ...(data.p || {}) }, r: data.r };
+}
+function applyConfig(cfg) {
+  CFG = cfg;
+  CALLS_KEY = cfg.v === 1 ? "dialer.calls" : "dialer.calls." + (cfg.s.mls || "campaign");
+  st.calls = store.get(CALLS_KEY, {});
+  st.agents = new Map(expand(cfg.r).map(a => [a.id, a]));
+  cards.clear(); dialCard = null; st.dialId = null;
+  renderHero();
+}
 async function loadPayload(payload) {
-  const rows = await decodePayload(payload);
-  if (!Array.isArray(rows) || !rows.length) throw new Error("empty");
-  store.set("dialer.rows", rows); store.set("dialer.payload", payload);
-  return rows;
+  const data = await decodePayload(payload);
+  const cfg = normalize(data);
+  store.set("dialer.data", data); store.set("dialer.payload", payload);
+  return cfg;
 }
 async function loadData() {
   const m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/);
@@ -237,15 +305,16 @@ async function loadData() {
     try { return await loadPayload(m[1]); }
     catch (e) { console.error(e); }
   }
-  return store.get("dialer.rows", null);
+  const saved = store.get("dialer.data", null) ?? store.get("dialer.rows", null);
+  if (saved) { try { return normalize(saved); } catch (e) { console.error(e); } }
+  return null;
 }
 async function loadFromText(text) {
   const m = String(text || "").match(/d=([A-Za-z0-9_-]{200,})/);
   if (!m) { toast("That doesn't look like your dialer link. Copy the whole link and try again."); return false; }
   try {
-    const rows = await loadPayload(m[1]);
-    st.agents = new Map(expand(rows).map(a => [a.id, a]));
-    cards.clear(); dialCard = null; render(); updateHomeCopy();
+    applyConfig(await loadPayload(m[1]));
+    render(); updateHomeCopy();
     toast(`Loaded ${st.agents.size} agents`);
     return true;
   } catch { toast("That link didn't load. Copy the whole link and try again."); return false; }
@@ -258,18 +327,27 @@ function updateHomeCopy() {
   const standalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
   $("#homeCopyRow").hidden = standalone || !homeLink();
 }
+function renderHero() {
+  const s = CFG && CFG.s;
+  $("#hero").hidden = !s || !s.street;
+  if (!s || !s.street) return;
+  const a = $("#heroMls"); a.textContent = s.mls || ""; a.href = s.key ? MATRIX(s.key) : "#";
+  $("#heroTitle").textContent = s.street + (s.building ? " · " + s.building : "");
+  $("#heroFacts").innerHTML = [s.price ? `<b>${esc(money(s.price))}</b>` : "", ...(s.facts || []).map(f => `<span>${esc(f)}</span>`)].join("");
+  $("#heroTag").hidden = !s.tag; $("#heroTag").textContent = s.tag || "";
+  document.title = (s.short || s.street) + " Dialer";
+}
 function renderSetup(view) {
   view.innerHTML = `<div class="empty">
     <h3>Load your agent list</h3>
     <p>This Home Screen app keeps its own storage, separate from Safari, so it needs your dialer link one time.</p>
     <ol style="margin:4px 0 0;padding-left:20px;color:var(--muted);display:flex;flex-direction:column;gap:4px">
-      <li>Open your dialer link in Safari, using the call sheet's Open phone dialer button or phone-dialer-link.txt.</li>
-      <li>At the bottom of that page, tap <b>Copy link for Home Screen app</b>.</li>
+      <li>Copy your full dialer link. It starts with https:// and has #d= in it.</li>
       <li>Come back here and tap <b>Paste link</b>.</li>
     </ol>
     <div class="row" style="margin-top:8px"><button class="btn primary" id="pasteLink">Paste link</button></div>
     <label class="note" for="linkBox" style="margin-top:6px">Or paste it into this box</label>
-    <textarea id="linkBox" rows="3" placeholder="https://kkekumano29.github.io/…#d=…"></textarea>
+    <textarea id="linkBox" rows="3" placeholder="https://…/call-dialer/#d=…"></textarea>
     <div class="row"><button class="btn" id="loadLink">Load list</button></div>
   </div>`;
   $("#pasteLink").onclick = async () => {
@@ -280,51 +358,44 @@ function renderSetup(view) {
   $("#linkBox").addEventListener("paste", () => setTimeout(() => loadFromText($("#linkBox").value), 50));
 }
 
-/* ---------- scripts ---------- */
+/* ---------- wording ---------- */
 const lead = a => a.listings[0];
-function opener(a) {
-  const l = lead(a);
-  if (l.status === "Pending") {
-    const fast = l.daysToContract != null && l.daysToContract <= 14 ? ` in just ${l.daysToContract} day${l.daysToContract === 1 ? "" : "s"}` : "";
-    return `Hi ${a.first}, it's Kalei Kekumano with eXp Realty. Got a quick minute? I saw ${l.street} went under contract${fast}. Congrats! Did you end up with multiple offers on that one?`;
-  }
-  const over = l.soldPrice && l.listPrice && l.soldPrice > l.listPrice ? ` for ${k$(l.soldPrice - l.listPrice)} over asking` : "";
-  return `Hi ${a.first}, it's Kalei Kekumano with eXp Realty. Got a quick minute? I saw you closed ${l.street}${over}. Congrats! Did you have other buyers who wanted it and missed out?`;
-}
-const PITCH = `Are any of them still looking? I just listed 94-213 Paioa Pl #J204 in Ho‘okumu at Waikele: top-floor corner, 2 bed / 2 bath, 830 sq ft plus a 90 sq ft lanai, two assigned stalls, golf course view, vacant. $515K. And the seller's VA loan is assumable at 3.625%.`;
-function voicemail(a) {
-  const l = lead(a);
-  const hook = l.status === "Pending" ? `Congrats on ${l.street} going into escrow.` : `Congrats on closing ${l.street}.`;
-  return `Hi ${a.first}, Kalei Kekumano with eXp Realty, ${ME.phone}. ${hook} I just listed a top-floor corner 2/2 at Ho‘okumu in Waikele with an assumable 3.625% VA loan, $515K. If any of your buyers missed out on ${l.street}, it could be a fit. I'll text you the MLS number. Again, ${ME.phone}.`;
-}
 function overK(n) { return n % 1000 === 0 ? "$" + (n / 1000) + "K" : "$" + (n / 1000).toFixed(1) + "K"; }
-function textMsg(a) {
-  const l = lead(a);
-  if (l.status === "Pending") {
-    const d = l.daysToContract;
-    const fast = d == null || d > 21 ? "" : d === 0 ? " the same day it listed" : ` in ${d} day${d === 1 ? "" : "s"}`;
-    return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on ${l.street} going under contract${fast}! I'm reaching out to see if any other buyers got left out. Did you receive multiple offers on the property?`;
-  }
-  const over = l.soldPrice && l.listPrice && l.soldPrice > l.listPrice ? ` for ${overK(l.soldPrice - l.listPrice)} over asking` : "";
-  return `Hey ${a.first}, this is Kalei with eXp Realty. Congrats on closing ${l.street}${over}! I'm reaching out to see if any other buyers got left out. Did you receive multiple offers on the property?`;
+function fastPhrase(d, cutoff, just) {
+  if (d == null || d > cutoff) return "";
+  if (d === 0) return " the same day it listed";
+  return ` in ${just ? "just " : ""}${d} day${d === 1 ? "" : "s"}`;
 }
+function fill(tpl, a) {
+  const l = a ? lead(a) : null, p = CFG.p, me = CFG.me, s = CFG.s;
+  const over = l && l.soldPrice && l.listPrice && l.soldPrice > l.listPrice ? ` for ${overK(l.soldPrice - l.listPrice)} over asking` : "";
+  const subject = [s.street, s.building ? `(${s.building})` : "", s.price ? k$(s.price) : ""].filter(Boolean).join(" ");
+  const map = {
+    agent: a ? a.first : "", meFirst: me.first, meName: me.name, brokerage: me.brokerage, phone: me.phone,
+    address: l ? l.street : "", over,
+    fast: l ? fastPhrase(l.daysToContract, p.fastDays, false) : "",
+    fastJust: l ? fastPhrase(l.daysToContract, p.openFastDays ?? p.fastDays, true) : "",
+    vmPitch: p.vmPitch || subject, pitchShort: p.pitchShort || subject, subject,
+    mls: s.mls || "", price: s.price ? k$(s.price) : "", area: p.area || "the area",
+  };
+  return String(tpl || "").replace(/\{(\w+)\}/g, (m, k) => (k in map ? map[k] : m));
+}
+const opener = a => fill(lead(a).status === "Pending" ? CFG.p.openPending : CFG.p.openClosed, a);
+const voicemail = a => fill(lead(a).status === "Pending" ? CFG.p.vmPending : CFG.p.vmClosed, a);
+const textMsg = a => fill(lead(a).status === "Pending" ? CFG.p.textPending : CFG.p.textClosed, a);
 const smsHref = a => "sms:+1" + digits(a.phone).slice(-10) + "&body=" + encodeURIComponent(textMsg(a));
 function scriptHTML(a) {
-  return `<div class="sc">
-    <div><h4>Open</h4><p class="say">${esc(opener(a))}</p></div>
-    <div><h4>If yes, pitch</h4><p class="say">${esc(PITCH)}</p>
-      <p class="private">Agent-only: about $273K loan balance, about $1,798/mo P&amp;I, about $242K down to assume at list. Lender and VA approval required; buyer pays assumption fees.</p></div>
-    <div><h4>Qualify their buyer</h4><ul>
-      <li>Do they have roughly $240K to put down, or cash coming from a sale?</li>
-      <li>Is the buyer a veteran? A veteran can substitute their own VA entitlement.</li>
-      <li>Want to see it? I need 8 hours' notice and I'll be there (SentriKey).</li></ul></div>
-    <div><h4>Close</h4><p class="say">I'll text you the MLS number right now so it's handy.</p></div>
-    <div><h4>Voicemail</h4><p class="say">${esc(voicemail(a))}</p></div>
-    <div><h4>If they say…</h4><ul>
-      <li><b>"No buyers right now."</b> No problem. If someone comes up in Central or Waikele under $550K, think of me. I'll text the MLS number so you have it.</li>
-      <li><b>"My buyer can't put $240K down."</b> That's fine. It works as a regular sale at $515K with their own financing. The assumption is a bonus for the right buyer.</li>
-      <li><b>"Just send me the details."</b> Will do. Texting the MLS number now, and I can email the assumption numbers too.</li></ul></div>
-  </div>`;
+  const p = CFG.p;
+  const sec = (h, body) => `<div><h4>${h}</h4>${body}</div>`;
+  const say = t => `<p class="say">${esc(fill(t, a))}</p>`;
+  const parts = [sec("Open", `<p class="say">${esc(opener(a))}</p>`)];
+  if (p.namesAsk) parts.push(sec("If yes, ask who wrote", say(p.namesAsk)));
+  parts.push(sec(p.namesAsk ? "If they have a buyer, pitch" : "If yes, pitch", say(p.pitch) + (p.agentOnly ? `<p class="private">${esc(fill(p.agentOnly, a))}</p>` : "")));
+  if (p.qualify && p.qualify.length) parts.push(sec("Qualify their buyer", `<ul>${p.qualify.map(q => `<li>${esc(fill(q, a))}</li>`).join("")}</ul>`));
+  if (p.close) parts.push(sec("Close", say(p.close)));
+  parts.push(sec("Voicemail", `<p class="say">${esc(voicemail(a))}</p>`));
+  if (p.objections && p.objections.length) parts.push(sec("If they say…", `<ul>${p.objections.map(([q, r]) => `<li><b>"${esc(q)}"</b> ${esc(fill(r, a))}</li>`).join("")}</ul>`));
+  return `<div class="sc">${parts.join("")}</div>`;
 }
 
 /* ---------- cards ---------- */
@@ -333,21 +404,23 @@ function listingHTML(l) {
     ? `Sold ${k$(l.soldPrice || l.listPrice)}${l.soldPrice && l.listPrice && l.soldPrice !== l.listPrice ? ` (list ${k$(l.listPrice)})` : ""} · closed ${md(l.closeDate)}`
     : `List ${k$(l.listPrice)} · offer accepted ${md(l.contractDate)}`;
   const dtc = l.daysToContract != null ? ` · ${l.daysToContract} days to contract` : "";
+  const facts = [l.building, l.beds || l.baths ? `${l.beds} bd / ${l.baths} ba` : "", l.sqft ? `${Number(l.sqft).toLocaleString()} sf` : ""].filter(Boolean);
   return `<li><a class="mls" href="${MATRIX(l.key)}" target="_blank" rel="noopener">${esc(l.mls)}</a>
     <span class="addr"><span class="st ${l.status === "Pending" ? "p" : "s"}">${l.status}</span>${esc(l.street)}, ${esc(l.city)}</span>
-    <span class="meta">${esc(l.building)} · ${esc(l.beds)} bd / ${esc(l.baths)} ba · ${Number(l.sqft).toLocaleString()} sf · ${price}${dtc}</span></li>`;
+    <span class="meta">${facts.map(f => esc(f)).join(" · ")} · ${price}${dtc}</span></li>`;
 }
 function buildCard(a, dial) {
   const el = document.createElement("article");
   el.className = "card"; el.dataset.id = a.id;
   const chips = a.signals.map(s => `<span class="chip">${esc(s)}</span>`);
   if (a.listings.length > 1) chips.push(`<span class="chip">${a.listings.length} deals in your area</span>`);
-  if (a.sameBrokerage) chips.push(`<span class="chip team">eXp teammate</span>`);
+  if (a.sameBrokerage) chips.push(`<span class="chip team">${esc(CFG.me.team)}</span>`);
   if (a.officeLine) chips.push(`<span class="chip warn">Office line: ask for ${esc(a.first)}</span>`);
   const sfx = dial ? "d" : "l";
+  const flags = CFG.p.flags || [];
   el.innerHTML = `
     <div class="head"><span class="order">#${a.order}</span>
-      <div class="who"><h3 class="name">${esc(a.name)}</h3><div class="office">${esc(a.office)} · office ${esc(a.officePhone)}</div></div>
+      <div class="who"><h3 class="name">${esc(a.name)}</h3><div class="office">${esc(a.office)}${a.officePhone ? " · office " + esc(a.officePhone) : ""}</div></div>
       <span class="pill" data-role="pill">Not called</span></div>
     ${chips.length ? `<div class="chips">${chips.join("")}</div>` : ""}
     <a class="phone" href="${telHref(a.phone)}">${esc(a.phone)}</a>
@@ -355,7 +428,7 @@ function buildCard(a, dial) {
       <a class="big call" href="${telHref(a.phone)}" data-act="call">Call</a>
       <a class="big text" href="${smsHref(a)}" data-act="sms">Text</a>
     </div>
-    ${a.coAgent ? `<div class="co">Co-listing: ${esc(a.coAgent)} · <a href="${telHref(a.coPhone)}">${esc(a.coPhone)}</a></div>` : ""}
+    ${a.coAgent ? `<div class="co">Co-listing: ${esc(a.coAgent)}${a.coPhone ? ` · <a href="${telHref(a.coPhone)}">${esc(a.coPhone)}</a>` : ""}</div>` : ""}
     <ul class="listings">${a.listings.map(listingHTML).join("")}</ul>
     <details class="script"${dial ? " open" : ""}><summary>Script for ${esc(a.first)}</summary>${scriptHTML(a)}</details>
     <div class="outcomes" role="group" aria-label="Call outcome">
@@ -367,13 +440,9 @@ function buildCard(a, dial) {
       <div class="row"><button class="btn" data-quick="2h">In 2 hours</button><button class="btn" data-quick="tm9">Tomorrow 9 AM</button><button class="btn" data-quick="tm1">Tomorrow 1 PM</button></div>
     </div>
     <div class="sub" data-role="hotRow" hidden>
-      <div class="checks">
-        <label><input type="checkbox" data-flag="vet"> Veteran buyer</label>
-        <label><input type="checkbox" data-flag="cash"> Has ~$240K+ down</label>
-        <label><input type="checkbox" data-flag="showing"> Wants a showing</label>
-      </div>
+      ${flags.length ? `<div class="checks">${flags.map(([k, label]) => `<label><input type="checkbox" data-flag="${esc(k)}"> ${esc(label)}</label>`).join("")}</div>` : ""}
       <label for="bn-${sfx}-${a.id}">About their buyer</label>
-      <textarea id="bn-${sfx}-${a.id}" data-field="buyerNote" rows="2" placeholder="Budget, financing, timeline, must-haves"></textarea>
+      <textarea id="bn-${sfx}-${a.id}" data-field="buyerNote" rows="2" placeholder="Agent names who wrote, budget, financing, timeline"></textarea>
     </div>
     <label class="note" for="nt-${sfx}-${a.id}">Notes</label>
     <textarea id="nt-${sfx}-${a.id}" data-field="note" rows="1" placeholder="Anything to remember for the next call"></textarea>
@@ -418,7 +487,7 @@ function refreshCard(id) {
 function patch(id, p) {
   st.calls[id] = { ...(st.calls[id] || {}), ...p };
   st.sticky.add(id);
-  if (!store.set("dialer.calls", st.calls)) toast("Couldn't save on this phone. Use Export to keep a copy.");
+  if (!store.set(CALLS_KEY, st.calls)) toast("Couldn't save on this phone. Use Export to keep a copy.");
   refreshCard(id); renderCounts();
 }
 function logOutcome(a, s) {
@@ -521,29 +590,33 @@ function renderDial(view) {
   $("#dNext").onclick = () => { const qq = dialQueue(); const i = qq.findIndex(x => x.id === a.id); const nx = qq[i + 1] || qq.find(x => x.id !== a.id); st.dialId = nx ? nx.id : null; st.sticky.clear(); render(); window.scrollTo({ top: 0 }); };
   $("#dPrev").onclick = () => { const qq = ordered(st.tab); const i = qq.findIndex(x => x.id === a.id); if (i > 0) { st.dialId = qq[i - 1].id; render(); window.scrollTo({ top: 0 }); } };
 }
+const campaignName = () => (CFG && (CFG.s.short || CFG.s.street)) || "Call sheet";
 function hotSummary() {
+  const flags = CFG.p.flags || [];
   return [...st.agents.values()].filter(a => st.calls[a.id]?.status === "hot").sort((x, y) => x.order - y.order).map(a => {
     const c = st.calls[a.id];
-    const flags = [c.vet && "veteran", c.cash && "has ~$240K+ down", c.showing && "wants a showing"].filter(Boolean).join(", ");
-    return `${a.name} (${a.office}) ${a.phone}${flags ? " | " + flags : ""}${c.buyerNote ? " | " + c.buyerNote : ""}${c.note ? " | note: " + c.note : ""}`;
+    const f = flags.filter(([k]) => c[k]).map(([, , short]) => short).join(", ");
+    return `${a.name} (${a.office}) ${a.phone}${f ? " | " + f : ""}${c.buyerNote ? " | " + c.buyerNote : ""}${c.note ? " | note: " + c.note : ""}`;
   }).join("\n");
 }
 function csv() {
-  const head = ["Order", "Group", "Agent", "Office", "Phone", "Outcome", "Call back at", "Attempts", "Last called", "Texted", "Veteran", "Has 240K down", "Wants showing", "Buyer notes", "Notes", "MLS numbers"];
+  const flags = CFG.p.flags || [];
+  const head = ["Order", "Group", "Agent", "Office", "Phone", "Outcome", "Call back at", "Attempts", "Last called", "Texted", ...flags.map(([, label]) => label), "Buyer notes", "Notes", "MLS numbers"];
   const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const rows = [...st.agents.values()].sort((x, y) => (x.group === y.group ? x.order - y.order : x.group === "pending" ? -1 : 1)).map(a => {
     const c = st.calls[a.id] || {};
     return [a.order, a.group, a.name, a.office, a.phone, c.status ? OUT[c.status].label : "Not called", c.callbackAt || "", c.attempts || 0,
-      c.lastAt ? new Date(c.lastAt).toLocaleString() : "", c.texted ? "yes" : "", c.vet ? "yes" : "", c.cash ? "yes" : "", c.showing ? "yes" : "",
+      c.lastAt ? new Date(c.lastAt).toLocaleString() : "", c.texted ? "yes" : "", ...flags.map(([k]) => (c[k] ? "yes" : "")),
       c.buyerNote || "", c.note || "", a.listings.map(l => l.mls).join(" ")].map(q).join(",");
   });
   return [head.map(q).join(","), ...rows].join("\n");
 }
 async function shareCsv() {
   const data = csv();
+  const slug = campaignName().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "call-sheet";
   try {
-    const file = new File([data], "paioa-j204-call-results.csv", { type: "text/csv" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: "Paioa J204 call results" }); return; }
+    const file = new File([data], slug + "-call-results.csv", { type: "text/csv" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: campaignName() + " call results" }); return; }
   } catch (e) { if (e && e.name === "AbortError") return; }
   copy(data, "CSV copied");
 }
@@ -553,10 +626,10 @@ function renderHot(view) {
   bar.innerHTML = `<button class="btn primary" id="copyHot">Copy hot-lead summary</button><button class="btn" id="shareCsv">Share results (CSV)</button><button class="btn" id="copyCsv">Copy CSV</button>`;
   wrap.append(bar);
   const hot = ordered("hot");
-  if (!hot.length) wrap.insertAdjacentHTML("beforeend", emptyHTML("No hot leads yet", "When an agent says they have a buyer, tap Has a buyer. Their card lands here with the buyer details you capture."));
+  if (!hot.length) wrap.insertAdjacentHTML("beforeend", emptyHTML("No hot leads yet", "When an agent says they have a buyer, or gives you names of agents who wrote, tap Has a buyer. Their card lands here with the details you capture."));
   for (const a of hot) { let el = cards.get(a.id); if (!el) { el = buildCard(a, false); cards.set(a.id, el); } else updateCard(el, a); wrap.append(el); }
   view.replaceChildren(wrap);
-  $("#copyHot").onclick = () => { const s = hotSummary(); s ? copy("Paioa J204 hot leads\n" + s, "Summary copied") : toast("No hot leads yet"); };
+  $("#copyHot").onclick = () => { const s = hotSummary(); s ? copy(campaignName() + " hot leads\n" + s, "Summary copied") : toast("No hot leads yet"); };
   $("#shareCsv").onclick = shareCsv;
   $("#copyCsv").onclick = () => copy(csv(), "CSV copied");
 }
@@ -576,10 +649,10 @@ function renderCounts() {
     const c = st.calls[a.id]; if (!c || !c.status) continue;
     worked++; if (c.status === "hot" || c.status === "no") talked++; if (c.status === "hot") hot++; if (isDue(c)) due++;
   }
-  const total = st.agents.size || 68;
-  $("#sCalled").textContent = worked; $("#sCalledL").textContent = `of ${total} worked`;
+  const total = st.agents.size;
+  $("#sCalled").textContent = worked; $("#sCalledL").textContent = total ? `of ${total} worked` : "worked";
   $("#sTalked").textContent = talked; $("#sHot").textContent = hot; $("#sCb").textContent = due;
-  $("#bar").style.width = Math.round((worked / total) * 100) + "%";
+  $("#bar").style.width = (total ? Math.round((worked / total) * 100) : 0) + "%";
   document.querySelectorAll("#tabs .tab").forEach(b => {
     const c = b.querySelector(".c");
     if (b.dataset.t === "hot") c.textContent = hot;
@@ -599,9 +672,8 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) { re
 
 /* ---------- start ---------- */
 (async () => {
-  st.calls = store.get("dialer.calls", {});
-  const rows = await loadData();
-  if (rows) st.agents = new Map(expand(rows).map(a => [a.id, a]));
+  const cfg = await loadData();
+  if (cfg) applyConfig(cfg);
   render(); updateHomeCopy();
 })();
 $("#homeCopy").onclick = () => { const l = homeLink(); if (l) copy(l, "Link copied. Now open the Home Screen app and tap Paste link."); };
